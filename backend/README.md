@@ -127,8 +127,8 @@ src/
 
 ## 관련 문서
 
-- `docs/RoadmapPlanner SRS.pdf`: 원본 요구사항 문서
-- `docs/workplan.md`: 백엔드 작업 계획
-- `docs/API.md`: API 계약 초안
-- `docs/tech-stack.md`: 백엔드 기술 스택 메모
-- `docs/gitcommit.md`: 커밋 메시지 규칙
+- `../docs/RoadmapPlanner SRS.pdf`: 원본 요구사항 문서
+- `../docs/workplan.md`: 백엔드 작업 계획
+- `../docs/API.md`: API 계약 초안
+- `../docs/tech-stack.md`: 백엔드 기술 스택 메모
+- `../docs/gitcommit.md`: 커밋 메시지 규칙
