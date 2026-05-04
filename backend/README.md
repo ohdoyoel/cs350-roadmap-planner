@@ -7,6 +7,7 @@
 - `docs/RoadmapPlanner SRS.pdf`: 원본 요구사항 문서
 - `docs/workplan.md`: 현재 백엔드 작업 계획
 - `docs/API.md`: 프론트엔드와 공유할 API 계약 초안
+- `docs/tech-stack.md`: 백엔드 기술 스택과 개발 환경 구성
 - `docs/gitcommit.md`: 커밋 메시지 작성 기준
 
 ## 개발 방향
