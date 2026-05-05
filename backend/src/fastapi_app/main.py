@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from db.client import close_database, init_database, ping_database
+from fastapi_app.routers.courses import router as courses_router
 from fastapi_app.routers.examples import router as examples_router
 
 
@@ -19,6 +20,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(courses_router)
 app.include_router(examples_router)
 
 
