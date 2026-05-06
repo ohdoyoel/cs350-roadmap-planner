@@ -1,40 +1,17 @@
-from datetime import datetime
-
 from fastapi import APIRouter
-from pydantic import BaseModel
 
-from db.models.example import Example
+from fastapi_app.schemas.examples import ExampleCreate, ExampleDTO
+from fastapi_app.services import examples as example_service
 
 router = APIRouter(prefix="/examples", tags=["examples"])
 
 
-class ExampleCreate(BaseModel):
-    name: str
+@router.post("", response_model=ExampleDTO)
+async def create_example(payload: ExampleCreate) -> ExampleDTO:
+    return await example_service.create_example(payload.name)
 
 
-class ExampleRead(BaseModel):
-    id: str
-    name: str
-    created_at: datetime
-
-
-def serialize_example(example: Example) -> ExampleRead:
-    return ExampleRead(
-        id=str(example.id),
-        name=example.name,
-        created_at=example.created_at,
-    )
-
-
-@router.post("", response_model=ExampleRead)
-async def create_example(payload: ExampleCreate) -> ExampleRead:
-    example = Example(name=payload.name)
-    await example.insert()
-    return serialize_example(example)
-
-
-@router.get("", response_model=list[ExampleRead])
-async def list_examples() -> list[ExampleRead]:
-    examples = await Example.find_all().to_list()
-    return [serialize_example(example) for example in examples]
+@router.get("", response_model=list[ExampleDTO])
+async def list_examples() -> list[ExampleDTO]:
+    return await example_service.list_examples()
 
