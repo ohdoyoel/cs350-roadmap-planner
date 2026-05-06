@@ -8,6 +8,9 @@ from fastapi_app.schemas.courses import (
 )
 
 
+type CourseLike = Course
+
+
 def get_course_level(course_code: str) -> int | None:
     digits = "".join(ch for ch in course_code if ch.isdigit())
     if not digits:
@@ -46,19 +49,16 @@ def course_matches_level(course: Course, level: int) -> bool:
     return get_course_level(course.course_code) == level
 
 
-async def list_courses(
+def filter_course_codes(
+    courses: list[CourseLike],
     query: str | None = None,
     category: str | None = None,
     sector: str | None = None,
     offered_semester: str | None = None,
     is_key_course: bool | None = None,
     level: int | None = None,
-    include_prerequisites: bool = False,
-) -> list[CourseDTO]:
-    courses = await Course.find_all().sort("+course_code").to_list()
-    courses_by_code = {course.course_code: course for course in courses}
-
-    matched_codes = {
+) -> set[str]:
+    return {
         course.course_code
         for course in courses
         if (query is None or course_matches_query(course, query))
@@ -72,26 +72,65 @@ async def list_courses(
         and (level is None or course_matches_level(course, level))
     }
 
+
+def expand_prerequisite_codes(
+    matched_codes: set[str],
+    courses_by_code: dict[str, CourseLike],
+) -> set[str]:
     result_codes = set(matched_codes)
-    if include_prerequisites:
-        pending = list(matched_codes)
-        while pending:
-            course_code = pending.pop()
-            course = courses_by_code.get(course_code)
-            if course is None:
+    pending = list(matched_codes)
+
+    while pending:
+        course_code = pending.pop()
+        course = courses_by_code.get(course_code)
+        if course is None:
+            continue
+
+        for prerequisite in course.prerequisites:
+            if prerequisite not in courses_by_code or prerequisite in result_codes:
                 continue
+            result_codes.add(prerequisite)
+            pending.append(prerequisite)
 
-            for prerequisite in course.prerequisites:
-                if prerequisite not in courses_by_code or prerequisite in result_codes:
-                    continue
-                result_codes.add(prerequisite)
-                pending.append(prerequisite)
+    return result_codes
 
+
+async def list_courses(
+    query: str | None = None,
+    category: str | None = None,
+    sector: str | None = None,
+    offered_semester: str | None = None,
+    is_key_course: bool | None = None,
+    level: int | None = None,
+    include_prerequisites: bool = False,
+) -> list[CourseDTO]:
+    courses = await load_courses()
+    courses_by_code = {course.course_code: course for course in courses}
+
+    matched_codes = filter_course_codes(
+        courses,
+        query=query,
+        category=category,
+        sector=sector,
+        offered_semester=offered_semester,
+        is_key_course=is_key_course,
+        level=level,
+    )
+
+    result_codes = (
+        expand_prerequisite_codes(matched_codes, courses_by_code)
+        if include_prerequisites
+        else set(matched_codes)
+    )
     return [
         serialize_course(courses_by_code[course_code], course_code in matched_codes)
         for course_code in sorted(result_codes)
         if course_code in courses_by_code
     ]
+
+
+async def load_courses() -> list[Course]:
+    return await Course.find_all().sort("+course_code").to_list()
 
 
 async def get_course(course_code: str) -> CourseDTO | None:
