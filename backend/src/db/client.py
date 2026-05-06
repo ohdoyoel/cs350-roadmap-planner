@@ -4,6 +4,9 @@ from pathlib import Path
 from beanie import init_beanie
 from pymongo import AsyncMongoClient
 
+from db.models.course import Course
+from db.models.course_category import CourseCategory
+from db.models.course_sector import CourseSector
 from db.models.example import Example
 
 _client: AsyncMongoClient | None = None
@@ -46,7 +49,7 @@ async def init_database() -> None:
     _client = AsyncMongoClient(get_mongodb_uri())
     await init_beanie(
         database=_client[get_mongodb_database()],
-        document_models=[Example],
+        document_models=[Course, CourseCategory, CourseSector, Example],
     )
 
 

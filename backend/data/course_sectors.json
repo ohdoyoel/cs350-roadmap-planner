@@ -1,0 +1,47 @@
+[
+  {
+    "sector": "데이터 과학",
+    "name_en": "Data Science",
+    "order": 1
+  },
+  {
+    "sector": "시스템-네트워크",
+    "name_en": "Systems and Networks",
+    "order": 2
+  },
+  {
+    "sector": "전산이론",
+    "name_en": "Theory",
+    "order": 3
+  },
+  {
+    "sector": "소프트웨어디자인",
+    "name_en": "Software Design",
+    "order": 4
+  },
+  {
+    "sector": "시큐어컴퓨팅",
+    "name_en": "Secure Computing",
+    "order": 5
+  },
+  {
+    "sector": "비주얼컴퓨팅",
+    "name_en": "Visual Computing",
+    "order": 6
+  },
+  {
+    "sector": "인공지능/정보서비스",
+    "name_en": "AI and Information Service",
+    "order": 7
+  },
+  {
+    "sector": "소셜컴퓨팅",
+    "name_en": "Social Computing",
+    "order": 8
+  },
+  {
+    "sector": "인터랙티브컴퓨팅",
+    "name_en": "Interactive Computing",
+    "order": 9
+  }
+]
