@@ -23,8 +23,7 @@ const styles = StyleSheet.create({
     height: 844,
     backgroundColor: '#fff',
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.08)',
+    borderRadius: 18,
     ...Platform.select({
       web: { boxShadow: '0 20px 60px rgba(0,0,0,0.2)' } as object,
       default: {},
