@@ -2,6 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet } from 'react-native';
 import { useSidebar } from '@/lib/sidebar/SidebarContext';
 
+const SIZE = 48;
+const HIDDEN_WIDTH = 16;
+
 export function SidebarToggleButton() {
   const { open } = useSidebar();
   return (
@@ -12,7 +15,7 @@ export function SidebarToggleButton() {
       accessibilityLabel="Open sidebar"
       hitSlop={8}
     >
-      <Ionicons name="search" size={20} color="#9ca3af" />
+      <Ionicons name="search" size={20} color="#fff" />
     </Pressable>
   );
 }
@@ -20,13 +23,15 @@ export function SidebarToggleButton() {
 const styles = StyleSheet.create({
   button: {
     position: 'absolute',
-    top: '42%',
-    right: 12,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#f3f4f6',
-    alignItems: 'center',
+    top: '24%',
+    right: -HIDDEN_WIDTH,
+    width: SIZE + HIDDEN_WIDTH,
+    height: SIZE,
+    borderTopLeftRadius: 16,
+    borderBottomLeftRadius: 16,
+    backgroundColor: '#d4d4d8',
+    alignItems: 'flex-start',
     justifyContent: 'center',
+    paddingLeft: 14,
   },
 });

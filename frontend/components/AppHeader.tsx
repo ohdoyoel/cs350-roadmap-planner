@@ -1,5 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { MenuIcon } from '@/components/icons/MenuIcon';
 
 type Props = {
   title: string;
@@ -16,7 +16,7 @@ export function AppHeader({ title, onLeftPress }: Props) {
         style={styles.leftSlot}
         disabled={!onLeftPress}
       >
-        <Ionicons name="menu" size={24} color="#111" />
+        <MenuIcon size={24} />
       </Pressable>
       <Text style={styles.title}>{title}</Text>
       <View style={styles.profile} />
@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 12,
+    paddingTop: 24,
+    paddingBottom: 16,
   },
   leftSlot: {
     width: 32,
@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 24,
+    fontFamily: 'Georgia',
     color: '#111',
   },
   profile: {
