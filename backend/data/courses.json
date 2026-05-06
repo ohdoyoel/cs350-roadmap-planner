@@ -1,520 +1,1252 @@
 [
   {
-    "code": "CS101",
-    "title": "프로그래밍 기초",
-    "requirement": "기초필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 2, "lab": 3, "credit": 2, "au": 0, "raw": "2:3:2(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS101",
+    "course_name": "프로그래밍 기초",
+    "course_name_en": "Introduction to Programming",
+    "category": "기초필수",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 2,
+      "lab": 3,
+      "credit": 2,
+      "au": 0,
+      "raw": "2:3:2(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS109",
-    "title": "프로그래밍 실습",
-    "requirement": "기초선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 2, "lab": 3, "credit": 3, "au": 0, "raw": "2:3:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": ["CS101"]
+    "course_code": "CS109",
+    "course_name": "프로그래밍 실습",
+    "course_name_en": "Programming Practice",
+    "category": "기초선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 2,
+      "lab": 3,
+      "credit": 3,
+      "au": 0,
+      "raw": "2:3:3(0)"
+    },
+    "prerequisites": [
+      "CS101"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "MAS110",
-    "title": "데이터과학을 위한 선형대수학",
-    "requirement": "기초선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 1, "credit": 3, "au": 0, "raw": "3:1:3(0)"},
-    "categories": [],
-    "prerequisites": []
+    "course_code": "MAS110",
+    "course_name": "데이터과학을 위한 선형대수학",
+    "category": "기초선택",
+    "sectors": [],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 1,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:1:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "MAS109",
-    "title": "선형대수학개론",
-    "requirement": "기초선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 1, "credit": 3, "au": 0, "raw": "3:1:3(0)"},
-    "categories": [],
-    "prerequisites": []
-  },
-
-
-  {
-    "code": "CS204",
-    "title": "이산구조",
-    "requirement": "전공필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론", "소프트웨어디자인","시큐어컴퓨팅"],
-    "prerequisites": []
-  },
-  {
-    "code": "CS206",
-    "title": "데이타구조",
-    "requirement": "전공필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["데이터 과학", "전산이론"],
-    "prerequisites": []
+    "course_code": "MAS109",
+    "course_name": "선형대수학개론",
+    "category": "기초선택",
+    "sectors": [],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 1,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:1:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS300",
-    "title": "알고리즘 개론",
-    "requirement": "전공필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": ["CS204", "CS206"]
+    "course_code": "CS204",
+    "course_name": "이산구조",
+    "course_name_en": "Discrete Mathematics",
+    "category": "전공필수",
+    "sectors": [
+      "전산이론",
+      "소프트웨어디자인",
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS311",
-    "title": "전산기조직",
-    "requirement": "전공필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["시스템-네트워크"],
-    "prerequisites": ["CS211","CS230"]
+    "course_code": "CS206",
+    "course_name": "데이타구조",
+    "course_name_en": "Data Structure",
+    "category": "전공필수",
+    "sectors": [
+      "데이터 과학",
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS320",
-    "title": "프로그래밍 언어",
-    "requirement": "전공필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": ["CS204", "CS230"],
+    "course_code": "CS300",
+    "course_name": "알고리즘 개론",
+    "course_name_en": "Introduction to Algorithms",
+    "category": "전공필수",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS204",
+      "CS206"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS311",
+    "course_name": "전산기조직",
+    "course_name_en": "Computer Organization",
+    "category": "전공필수",
+    "sectors": [
+      "시스템-네트워크"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS211",
+      "CS230"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS320",
+    "course_name": "프로그래밍 언어",
+    "course_name_en": "Programming Language",
+    "category": "전공필수",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS204",
+      "CS230"
+    ],
     "is_key_course": true
   },
   {
-    "code": "CS330",
-    "title": "운영체제 및 실험",
-    "requirement": "전공필수",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 3, "credit": 4, "au": 0, "raw": "3:3:4(0)"},
-    "categories": ["시스템-네트워크, 시큐어컴퓨팅"],
-    "prerequisites": ["CS230"],
+    "course_code": "CS330",
+    "course_name": "운영체제 및 실험",
+    "course_name_en": "Operating Systems and Lab.",
+    "category": "전공필수",
+    "sectors": [
+      "시스템-네트워크",
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 3,
+      "credit": 4,
+      "au": 0,
+      "raw": "3:3:4(0)"
+    },
+    "prerequisites": [
+      "CS230"
+    ],
     "is_key_course": true
   },
   {
-    "code": "CS230",
-    "title": "시스템 프로그래밍",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["시스템-네트워크", "시큐어컴퓨팅"],
+    "course_code": "CS230",
+    "course_name": "시스템 프로그래밍",
+    "course_name_en": "System Programming",
+    "category": "전공선택",
+    "sectors": [
+      "시스템-네트워크",
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
     "prerequisites": [],
     "is_key_course": true
   },
   {
-    "code": "CS341",
-    "title": "전산망개론",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 3, "credit": 4, "au": 0, "raw": "3:3:4(0)"},
-    "categories": ["시스템-네트워크, 시큐어컴퓨팅"],
-    "prerequisites": ["CS230"],
+    "course_code": "CS341",
+    "course_name": "전산망개론",
+    "course_name_en": "Introduction to Computer Network",
+    "category": "전공선택",
+    "sectors": [
+      "시스템-네트워크",
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 3,
+      "credit": 4,
+      "au": 0,
+      "raw": "3:3:4(0)"
+    },
+    "prerequisites": [
+      "CS230"
+    ],
     "is_key_course": true
   },
-
-
   {
-    "code": "CS361",
-    "title": "데이터 사이언스 개론",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["데이터 과학"],
-    "prerequisites": ["CS206"]
+    "course_code": "CS361",
+    "course_name": "데이터 사이언스 개론",
+    "course_name_en": "Introduction to Data Science",
+    "category": "전공선택",
+    "sectors": [
+      "데이터 과학"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS206"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS360",
-    "title": "데이타베이스 개론",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["데이터 과학", "소셜컴퓨팅"],
-    "prerequisites": ["CS206"]
-  },
-
-
-  {
-    "code": "CS350",
-    "title": "소프트웨어 공학개론",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소프트웨어디자인"],
-    "prerequisites": []
-  },
-  {
-    "code": "CS453",
-    "title": "소프트웨어 테스팅 자동화 기법",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소프트웨어디자인"],
-    "prerequisites": ["CS350"]
+    "course_code": "CS360",
+    "course_name": "데이타베이스 개론",
+    "course_name_en": "Introduction to Database",
+    "category": "전공선택",
+    "sectors": [
+      "데이터 과학",
+      "소셜컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS206"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS454",
-    "title": "AI 인공지능 기반 소프트웨어 공학",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소프트웨어디자인"],
-    "prerequisites": ["CS350"]
+    "course_code": "CS350",
+    "course_name": "소프트웨어 공학개론",
+    "course_name_en": "Introduction to Software Engineering",
+    "category": "전공선택",
+    "sectors": [
+      "소프트웨어디자인"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS457",
-    "title": "스마트환경을 위한 요구공학",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소프트웨어디자인"],
-    "prerequisites": ["CS350"]
-  },
-
-
-  {
-    "code": "CS211",
-    "title": "디지털시스템 및 실험",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 4, "credit": 4, "au": 0, "raw": "3:4:4(0)"},
-    "categories": ["시스템-네트워크"],
-    "prerequisites": []
-  },
-  {
-    "code": "CS310",
-    "title": "내장형 컴퓨터 시스템",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 3, "credit": 4, "au": 0, "raw": "3:3:4(0)"},
-    "categories": ["시스템-네트워크"],
-    "prerequisites": ["CS211"]
+    "course_code": "CS453",
+    "course_name": "소프트웨어 테스팅 자동화 기법",
+    "course_name_en": "Automated Software Testing",
+    "category": "전공선택",
+    "sectors": [
+      "소프트웨어디자인"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS350"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS422",
-    "title": "계산이론",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["시스템-네트워크"],
-    "prerequisites": ["CS300"]
+    "course_code": "CS454",
+    "course_name": "AI 인공지능 기반 소프트웨어 공학",
+    "course_name_en": "Artificial Intelligence Based Software Engineering",
+    "category": "전공선택",
+    "sectors": [
+      "소프트웨어디자인"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS350"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS443",
-    "title": "분산 알고리즘 및 시스템",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론", "시스템-네트워크"],
-    "prerequisites": []
-  },
-
-
-  {
-    "code": "CS376",
-    "title": "AI 기계학습",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["비주얼컴퓨팅", "인공지능/정보서비스"],
-    "prerequisites": []
-  },
-  {
-    "code": "CS482",
-    "title": "대화형 컴퓨터그래픽스",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 2, "credit": 3, "au": 0, "raw": "3:2:3(0)"},
-    "categories": [ "비주얼컴퓨팅", "인터랙티브컴퓨팅"],
-    "prerequisites": []
+    "course_code": "CS457",
+    "course_name": "스마트환경을 위한 요구공학",
+    "course_name_en": "Requirements Engineering for Smart Environments",
+    "category": "전공선택",
+    "sectors": [
+      "소프트웨어디자인"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS350"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS485",
-    "title": "컴퓨터비전을 위한 기계학습",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["비주얼컴퓨팅"],
-    "prerequisites": []
+    "course_code": "CS211",
+    "course_name": "디지털시스템 및 실험",
+    "course_name_en": "Digital System and Lab.",
+    "category": "전공선택",
+    "sectors": [
+      "시스템-네트워크"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 4,
+      "credit": 4,
+      "au": 0,
+      "raw": "3:4:4(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS380",
-    "title": "컴퓨터그래픽스 개론",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 3, "credit": 4, "au": 0, "raw": "3:3:4(0)"},
-    "categories": ["비주얼컴퓨팅", "인터랙티브컴퓨팅"],
-    "prerequisites": []
+    "course_code": "CS310",
+    "course_name": "내장형 컴퓨터 시스템",
+    "course_name_en": "Embedded Computer System",
+    "category": "전공선택",
+    "sectors": [
+      "시스템-네트워크"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 3,
+      "credit": 4,
+      "au": 0,
+      "raw": "3:3:4(0)"
+    },
+    "prerequisites": [
+      "CS211"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS484",
-    "title": "AI 컴퓨터비전개론",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["비주얼컴퓨팅", "인공지능/정보서비스"],
-    "prerequisites": ["CS470", "CS474"]
-  },
-
-
-  {
-    "code": "CS402",
-    "title": "전산논리학 개론",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": ["CS300", "CS320"]
-  },
-  {
-    "code": "CS202",
-    "title": "문제해결기법",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 2, "lab": 3, "credit": 3, "au": 0, "raw": "2:3:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS422",
+    "course_name": "계산이론",
+    "course_name_en": "Computation Theory",
+    "category": "전공선택",
+    "sectors": [
+      "시스템-네트워크"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS300"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS322",
-    "title": "형식언어 및 오토마타",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS443",
+    "course_name": "분산 알고리즘 및 시스템",
+    "course_name_en": "Distributed Algorithms and Systems",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론",
+      "시스템-네트워크"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS431",
-    "title": "동시성 프로그래밍",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS376",
+    "course_name": "AI 기계학습",
+    "course_name_en": "Machine Learning",
+    "category": "전공선택",
+    "sectors": [
+      "비주얼컴퓨팅",
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS458",
-    "title": "소프트웨어 소스 코드 기반 동적 분석",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS482",
+    "course_name": "대화형 컴퓨터그래픽스",
+    "course_name_en": "Interactive Computer Graphics",
+    "category": "전공선택",
+    "sectors": [
+      "비주얼컴퓨팅",
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 2,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:2:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS481",
-    "title": "데이터 시각화",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS485",
+    "course_name": "컴퓨터비전을 위한 기계학습",
+    "course_name_en": "Machine Learning for Computer Vision",
+    "category": "전공선택",
+    "sectors": [
+      "비주얼컴퓨팅"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS459",
-    "title": "서비스 컴퓨팅 개론",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": ["CS330"]
+    "course_code": "CS380",
+    "course_name": "컴퓨터그래픽스 개론",
+    "course_name_en": "Introduction to Computer Graphics",
+    "category": "전공선택",
+    "sectors": [
+      "비주얼컴퓨팅",
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 3,
+      "credit": 4,
+      "au": 0,
+      "raw": "3:3:4(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS220",
-    "title": "프로그래밍의 이해",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS484",
+    "course_name": "AI 컴퓨터비전개론",
+    "course_name_en": "Introduction to Computer Vision",
+    "category": "전공선택",
+    "sectors": [
+      "비주얼컴퓨팅",
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS470",
+      "CS474"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS370",
-    "title": "심볼릭 프로그래밍",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 2, "lab": 3, "credit": 3, "au": 0, "raw": "2:3:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS402",
+    "course_name": "전산논리학 개론",
+    "course_name_en": "Introduction to Logic for Computer Science",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS300",
+      "CS320"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS477",
-    "title": "지능로봇공학 개론",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": []
+    "course_code": "CS202",
+    "course_name": "문제해결기법",
+    "course_name_en": "Problem Solving",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 2,
+      "lab": 3,
+      "credit": 3,
+      "au": 0,
+      "raw": "2:3:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS479",
-    "title": "3차원 데이터를 위한 기계 학습",
-    "requirement": "전공선택",
-    "terms": ["S","F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론", "인공지능/정보서비스"],
-    "prerequisites": []
+    "course_code": "CS322",
+    "course_name": "형식언어 및 오토마타",
+    "course_name_en": "Formal Languages and Automata",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS475",
-    "title": "자연언어처리를 위한 기계학습",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["전산이론"],
-    "prerequisites": ["CS372", "CS376"]
-  },
-
-
-  {
-    "code": "CS420",
-    "title": "컴파일러 설계",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["시큐어컴퓨팅"],
-    "prerequisites": ["CS300"]
-  },
-  {
-    "code": "CS447",
-    "title": "웹 보안 공격 실습",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 2, "lab": 3, "credit": 3, "au": 0, "raw": "2:3:3(0)"},
-    "categories": ["시큐어컴퓨팅"],
-    "prerequisites": []
+    "course_code": "CS431",
+    "course_name": "동시성 프로그래밍",
+    "course_name_en": "Concurrent Programming",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS348",
-    "title": "정보보호개론",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["시큐어컴퓨팅"],
-    "prerequisites": ["CS220", "CS230"]
-  },
-
-
-  {
-    "code": "CS442",
-    "title": "모바일 컴퓨팅과 응용",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소셜컴퓨팅", "인터랙티브컴퓨팅"],
-    "prerequisites": []
-  },
-  {
-    "code": "CS374",
-    "title": "인간-컴퓨터 상호작용 개론",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소셜컴퓨팅", "인터랙티브컴퓨팅"],
-    "prerequisites": []
+    "course_code": "CS458",
+    "course_name": "소프트웨어 소스 코드 기반 동적 분석",
+    "course_name_en": "Dynamic Analysis of Software Source Code",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS473",
-    "title": "소셜 컴퓨팅 개론",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소셜컴퓨팅", "인터랙티브컴퓨팅"],
-    "prerequisites": ["CS374"]
+    "course_code": "CS481",
+    "course_name": "데이터 시각화",
+    "course_name_en": "Data Visualization",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS372",
-    "title": "AI 파이썬을 통한 자연언어처리",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소셜컴퓨팅", "인공지능/정보서비스"],
-    "prerequisites": []
+    "course_code": "CS459",
+    "course_name": "서비스 컴퓨팅 개론",
+    "course_name_en": "Introduction to Services Computing",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS330"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS470",
-    "title": "AI 인공지능개론",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소셜컴퓨팅", "인공지능/정보서비스"],
-    "prerequisites": ["CS372", "CS376"]
+    "course_code": "CS220",
+    "course_name": "프로그래밍의 이해",
+    "course_name_en": "Programming Principles",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS489",
-    "title": "컴퓨터 윤리와 사회문제",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["소셜컴퓨팅"],
-    "prerequisites": []
-  },
-
-
-  {
-    "code": "CS270",
-    "title": "AI 지능 로봇 설계 및 프로그래밍",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 2, "lab": 3, "credit": 3, "au": 0, "raw": "2:3:3(0)"},
-    "categories": ["인공지능/정보서비스", "인터랙티브컴퓨팅"],
-    "prerequisites": []
-  },
-  {
-    "code": "CS411",
-    "title": "인공지능을 위한 시스템",
-    "requirement": "전공선택",
-    "terms": ["S", "F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["인공지능/정보서비스"],
-    "prerequisites": []
+    "course_code": "CS370",
+    "course_name": "심볼릭 프로그래밍",
+    "course_name_en": "Symbolic Programming",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 2,
+      "lab": 3,
+      "credit": 3,
+      "au": 0,
+      "raw": "2:3:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS423",
-    "title": "AI 확률적 프로그래밍",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["인공지능/정보서비스"],
-    "prerequisites": ["CS300", "CS320", "CS376"]
+    "course_code": "CS477",
+    "course_name": "지능로봇공학 개론",
+    "course_name_en": "Introduction to Intelligent Robotics",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS371",
-    "title": "딥러닝 개론",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["인공지능/정보서비스"],
-    "prerequisites": []
+    "course_code": "CS479",
+    "course_name": "3차원 데이터를 위한 기계 학습",
+    "course_name_en": "Machine Learning for 3D Data",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론",
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   },
   {
-    "code": "CS474",
-    "title": "AI 텍스트마이닝",
-    "requirement": "전공선택",
-    "terms": ["F"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["인공지능/정보서비스"],
-    "prerequisites": ["CS372", "CS376"]
+    "course_code": "CS475",
+    "course_name": "자연언어처리를 위한 기계학습",
+    "course_name_en": "Machine Learning for Natural Language Processing",
+    "category": "전공선택",
+    "sectors": [
+      "전산이론"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS372",
+      "CS376"
+    ],
+    "is_key_course": false
   },
   {
-    "code": "CS471",
-    "title": "그래프 기계학습 및 마이닝",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["인공지능/정보서비스"],
-    "prerequisites": []
+    "course_code": "CS420",
+    "course_name": "컴파일러 설계",
+    "course_name_en": "Compiler Design",
+    "category": "전공선택",
+    "sectors": [
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS300"
+    ],
+    "is_key_course": false
   },
-  
   {
-    "code": "CS486",
-    "title": "웨어러블 사용자 인터페이스",
-    "requirement": "전공선택",
-    "terms": ["S"],
-    "credits": {"lecture": 3, "lab": 0, "credit": 3, "au": 0, "raw": "3:0:3(0)"},
-    "categories": ["인터랙티브컴퓨팅"],
-    "prerequisites": []
+    "course_code": "CS447",
+    "course_name": "웹 보안 공격 실습",
+    "course_name_en": "Web Security Attack Laboratory",
+    "category": "전공선택",
+    "sectors": [
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 2,
+      "lab": 3,
+      "credit": 3,
+      "au": 0,
+      "raw": "2:3:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS348",
+    "course_name": "정보보호개론",
+    "course_name_en": "Introduction to Information Security",
+    "category": "전공선택",
+    "sectors": [
+      "시큐어컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS220",
+      "CS230"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS442",
+    "course_name": "모바일 컴퓨팅과 응용",
+    "course_name_en": "Mobile Computing and Application",
+    "category": "전공선택",
+    "sectors": [
+      "소셜컴퓨팅",
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS374",
+    "course_name": "인간-컴퓨터 상호작용 개론",
+    "course_name_en": "Introduction toHuman-Computer Interaction",
+    "category": "전공선택",
+    "sectors": [
+      "소셜컴퓨팅",
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS473",
+    "course_name": "소셜 컴퓨팅 개론",
+    "course_name_en": "Introduction to Social Computing",
+    "category": "전공선택",
+    "sectors": [
+      "소셜컴퓨팅",
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS374"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS372",
+    "course_name": "AI 파이썬을 통한 자연언어처리",
+    "course_name_en": "Natural Language Processing with Python",
+    "category": "전공선택",
+    "sectors": [
+      "소셜컴퓨팅",
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS470",
+    "course_name": "AI 인공지능개론",
+    "course_name_en": "Introduction to Artificial Intelligence",
+    "category": "전공선택",
+    "sectors": [
+      "소셜컴퓨팅",
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS372",
+      "CS376"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS489",
+    "course_name": "컴퓨터 윤리와 사회문제",
+    "course_name_en": "Computer Ethic & Social Issues",
+    "category": "전공선택",
+    "sectors": [
+      "소셜컴퓨팅"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS270",
+    "course_name": "AI 지능 로봇 설계 및 프로그래밍",
+    "course_name_en": "Creative design of intelligent robots",
+    "category": "전공선택",
+    "sectors": [
+      "인공지능/정보서비스",
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 2,
+      "lab": 3,
+      "credit": 3,
+      "au": 0,
+      "raw": "2:3:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS411",
+    "course_name": "인공지능을 위한 시스템",
+    "course_name_en": "System for Artificial Intelligence",
+    "category": "전공선택",
+    "sectors": [
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "S",
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS423",
+    "course_name": "AI 확률적 프로그래밍",
+    "course_name_en": "Probabilistic Programming",
+    "category": "전공선택",
+    "sectors": [
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS300",
+      "CS320",
+      "CS376"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS371",
+    "course_name": "딥러닝 개론",
+    "course_name_en": "Introduction to Deep Learning",
+    "category": "전공선택",
+    "sectors": [
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS474",
+    "course_name": "AI 텍스트마이닝",
+    "course_name_en": "Text Mining",
+    "category": "전공선택",
+    "sectors": [
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "F"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [
+      "CS372",
+      "CS376"
+    ],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS471",
+    "course_name": "그래프 기계학습 및 마이닝",
+    "course_name_en": "Graph Machine Learning and Mining",
+    "category": "전공선택",
+    "sectors": [
+      "인공지능/정보서비스"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
+  },
+  {
+    "course_code": "CS486",
+    "course_name": "웨어러블 사용자 인터페이스",
+    "course_name_en": "Wearable User Interface",
+    "category": "전공선택",
+    "sectors": [
+      "인터랙티브컴퓨팅"
+    ],
+    "offered_semesters": [
+      "S"
+    ],
+    "credit": {
+      "lecture": 3,
+      "lab": 0,
+      "credit": 3,
+      "au": 0,
+      "raw": "3:0:3(0)"
+    },
+    "prerequisites": [],
+    "is_key_course": false
   }
 ]
