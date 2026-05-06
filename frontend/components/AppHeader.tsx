@@ -1,12 +1,14 @@
+import { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MenuIcon } from '@/components/icons/MenuIcon';
 
 type Props = {
-  title: string;
+  title?: string;
+  children?: ReactNode;
   onLeftPress?: () => void;
 };
 
-export function AppHeader({ title, onLeftPress }: Props) {
+export function AppHeader({ title, children, onLeftPress }: Props) {
   return (
     <View style={styles.container}>
       <Pressable
@@ -18,7 +20,9 @@ export function AppHeader({ title, onLeftPress }: Props) {
       >
         <MenuIcon size={24} />
       </Pressable>
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.titleSlot}>
+        {children ?? (title ? <Text style={styles.title}>{title}</Text> : null)}
+      </View>
       <View style={styles.profile} />
     </View>
   );
@@ -28,7 +32,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 24,
     paddingBottom: 16,
@@ -37,6 +40,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  titleSlot: {
+    flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   title: {
