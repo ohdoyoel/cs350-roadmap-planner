@@ -16,7 +16,7 @@ Roadmap Planner 백엔드 작업 공간입니다.
 cp .env.example .env
 ```
 
-`.env`에는 MongoDB 접속 정보를 채워 넣습니다. 이 파일은 Git에 올라가지 않습니다.
+`.env`에는 MongoDB 접속 정보와 비밀번호 해싱용 `PASSWORD_PEPPER`를 채워 넣습니다. 이 파일은 Git에 올라가지 않습니다.
 
 현재 로컬 Docker 개발 환경에서는 백엔드가 `MONGODB_URI`를 통해 MongoDB에 접속합니다.
 
@@ -86,19 +86,21 @@ Content-Type: application/json
 
 {
   "email": "student@kaist.ac.kr",
+  "password": "secure-password",
   "name": "Student",
   "graduationYear": 2027
 }
 ```
 
-이미 가입된 사용자는 `/auth/login`에 KAIST 이메일만 전달해 새 세션을 발급받습니다.
+이미 가입된 사용자는 `/auth/login`에 KAIST 이메일과 비밀번호를 전달해 새 세션을 발급받습니다.
 
 ```http
 POST /auth/login
 Content-Type: application/json
 
 {
-  "email": "student@kaist.ac.kr"
+  "email": "student@kaist.ac.kr",
+  "password": "secure-password"
 }
 ```
 
