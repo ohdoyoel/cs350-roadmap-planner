@@ -3,8 +3,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from db.client import close_database, init_database, ping_database
+from fastapi_app.routers.auth import router as auth_router
 from fastapi_app.routers.courses import router as courses_router
 from fastapi_app.routers.examples import router as examples_router
+from fastapi_app.routers.users import router as users_router
 
 
 @asynccontextmanager
@@ -20,8 +22,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth_router)
 app.include_router(courses_router)
 app.include_router(examples_router)
+app.include_router(users_router)
 
 
 @app.get("/")

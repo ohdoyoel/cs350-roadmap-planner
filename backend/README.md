@@ -60,6 +60,12 @@ http://localhost:8000
 ```text
 GET http://localhost:8000/health
 GET http://localhost:8000/db/health
+POST http://localhost:8000/auth/login
+POST http://localhost:8000/auth/signup
+GET http://localhost:8000/me
+GET http://localhost:8000/courses
+GET http://localhost:8000/courses/categories
+GET http://localhost:8000/courses/sectors
 GET http://localhost:8000/examples
 POST http://localhost:8000/examples
 ```
@@ -68,6 +74,39 @@ FastAPI 문서 페이지:
 
 ```text
 http://localhost:8000/docs
+```
+
+## 회원가입과 로그인
+
+`/auth/signup`은 새 사용자를 만들고 세션을 발급합니다.
+
+```http
+POST /auth/signup
+Content-Type: application/json
+
+{
+  "email": "student@kaist.ac.kr",
+  "name": "Student",
+  "graduationYear": 2027
+}
+```
+
+이미 가입된 사용자는 `/auth/login`에 KAIST 이메일만 전달해 새 세션을 발급받습니다.
+
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "student@kaist.ac.kr"
+}
+```
+
+응답의 `sessionToken`을 이후 사용자 기반 API에 Bearer token으로 전달합니다.
+
+```http
+GET /me
+Authorization: Bearer <sessionToken>
 ```
 
 ## MongoDB 연결 정보

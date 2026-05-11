@@ -6,7 +6,7 @@
 | --- | --- |
 | Base URL | `http://localhost:8000` |
 | Swagger UI | `http://localhost:8000/docs` |
-| 인증 | 현재 구현된 API는 인증을 사용하지 않음 |
+| 인증 | 사용자 기반 API는 Bearer session token 사용 |
 
 ## 공통 응답
 
@@ -164,6 +164,162 @@ GET /courses?isKeyCourse=true
 GET /courses?level=300
 GET /courses?sector=인공지능/정보서비스&includePrerequisites=true
 ```
+
+## `POST /auth/signup`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | KAIST 이메일 기반 사용자 생성 및 로그인 세션 발급 |
+| 인증 | 불필요 |
+| Query Params | 없음 |
+
+### Request Body
+
+| 필드 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `email` | string | 예 | `@kaist.ac.kr` 이메일 |
+| `name` | string \| null | 아니오 | 사용자 이름 |
+| `graduationYear` | integer \| null | 아니오 | 졸업 예정 연도 |
+
+```json
+{
+  "email": "student@kaist.ac.kr",
+  "name": "Student",
+  "graduationYear": 2027
+}
+```
+
+### Response `200`
+
+| 필드 | 타입 | 설명 |
+| --- | --- | --- |
+| `sessionToken` | string | 이후 사용자 기반 API에서 사용할 Bearer session token |
+| `tokenType` | string | 항상 `bearer` |
+| `expiresAt` | string | 현재 세션 만료 시각 |
+| `user` | object | 로그인한 사용자 기본 정보 |
+
+```json
+{
+  "sessionToken": "QodAV4fbW3lIP0y0Kscqaw5lH1Z2g9Xx...",
+  "tokenType": "bearer",
+  "expiresAt": "2026-05-11T13:00:00Z",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "name": "Student",
+    "kaistEmail": "student@kaist.ac.kr",
+    "createdAt": "2026-05-11T12:00:00Z",
+    "updatedAt": "2026-05-11T12:00:00Z"
+  }
+}
+```
+
+### Error
+
+KAIST 이메일이 아니면 `422`, 이미 가입된 이메일이면 `409`를 반환합니다.
+
+```json
+{
+  "detail": "User already exists"
+}
+```
+
+## `POST /auth/login`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 기존 KAIST 이메일 사용자 로그인 세션 발급 |
+| 인증 | 불필요 |
+| Query Params | 없음 |
+
+### Request Body
+
+| 필드 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `email` | string | 예 | 가입된 `@kaist.ac.kr` 이메일 |
+
+```json
+{
+  "email": "student@kaist.ac.kr"
+}
+```
+
+### Response `200`
+
+`POST /auth/signup`과 같은 세션 응답을 반환합니다.
+
+### Error
+
+KAIST 이메일이 아니면 `422`, 가입된 사용자가 없으면 `404`를 반환합니다.
+
+```json
+{
+  "detail": "User not found"
+}
+```
+
+## `GET /me`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | Bearer token 기준 현재 사용자 정보 조회 |
+| 인증 | 필요 |
+| Query Params | 없음 |
+| Request Body | 없음 |
+
+### Headers
+
+```http
+Authorization: Bearer <sessionToken>
+```
+
+### Response `200`
+
+현재 사용자 기본 정보와 settings 객체를 함께 반환합니다.
+
+```json
+{
+  "id": "507f1f77bcf86cd799439011",
+  "name": "Student",
+  "kaistEmail": "student@kaist.ac.kr",
+  "createdAt": "2026-05-11T12:00:00Z",
+  "updatedAt": "2026-05-11T12:00:00Z",
+  "settings": {
+    "id": "607f1f77bcf86cd799439011",
+    "userId": "507f1f77bcf86cd799439011",
+    "language": "ko",
+    "theme": "system",
+    "academicOption": "major",
+    "graduationYear": 2027
+  }
+}
+```
+
+### Error
+
+session token이 없거나 유효하지 않으면 `401`을 반환합니다.
+
+## `POST /auth/logout`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 현재 session token 무효화 |
+| 인증 | 필요 |
+| Query Params | 없음 |
+| Request Body | 없음 |
+
+### Headers
+
+```http
+Authorization: Bearer <sessionToken>
+```
+
+### Response `204`
+
+응답 본문 없이 현재 세션을 종료합니다.
+
+### Error
+
+session token이 없거나 유효하지 않으면 `401`을 반환합니다.
 
 ## `GET /courses/{courseCode}`
 
