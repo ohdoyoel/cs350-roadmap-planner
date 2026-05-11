@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 from db.models.user import User
 from db.models.user_settings import UserSettings
 from fastapi_app.schemas.users import UserDTO, UserWithSettingsDTO
+from fastapi_app.security import hash_password
 from fastapi_app.services.settings import serialize_settings
 
 
@@ -43,6 +44,7 @@ async def get_user_by_email(email: str) -> User | None:
 
 async def create_user(
     email: str,
+    password: str,
     name: str | None = None,
 ) -> User:
     normalized_email = email.strip().lower()
@@ -56,6 +58,7 @@ async def create_user(
     now = datetime.now(UTC)
     user = User(
         kaist_email=normalized_email,
+        password_hash=hash_password(password),
         name=name,
         updated_at=now,
     )

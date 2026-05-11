@@ -9,6 +9,7 @@ class LoginRequest(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     email: str
+    password: str = Field(min_length=8)
 
     @field_validator("email")
     @classmethod
@@ -18,11 +19,19 @@ class LoginRequest(BaseModel):
             raise ValueError("KAIST email is required")
         return normalized
 
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if value.strip() != value:
+            raise ValueError("Password must not start or end with whitespace")
+        return value
+
 
 class SignupRequest(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     email: str
+    password: str = Field(min_length=8)
     name: str | None = None
     graduation_year: int | None = Field(
         default=None,
@@ -45,6 +54,13 @@ class SignupRequest(BaseModel):
             return None
         normalized = value.strip()
         return normalized or None
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if value.strip() != value:
+            raise ValueError("Password must not start or end with whitespace")
+        return value
 
 
 class SessionResponse(BaseModel):
