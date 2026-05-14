@@ -62,7 +62,7 @@ export const FILTER_CHIPS: { id: FilterChipId; label_en: string }[] = [
   { id: 'major_required', label_en: 'Required Major' },
   { id: 'major_elective', label_en: 'Elective Major' },
   { id: 'general_elective', label_en: 'Others' },
-  { id: 'graduation_research', label_en: 'Grad' },
+  { id: 'graduation_research', label_en: 'Graduation Research' },
   { id: 'custom', label_en: 'Custom' },
 ];
 
