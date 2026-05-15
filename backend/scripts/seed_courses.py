@@ -1,10 +1,9 @@
 import argparse
 import asyncio
 import json
-import os
 from pathlib import Path
 
-from db.client import close_database, init_database, load_dotenv
+from db.client import close_database, init_database
 from db.models.course import Course
 from db.models.course_category import CourseCategory
 from db.models.course_sector import CourseSector
@@ -14,15 +13,6 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_DATA_FILE = BACKEND_DIR / "data" / "courses.json"
 DEFAULT_CATEGORIES_FILE = BACKEND_DIR / "data" / "course_categories.json"
 DEFAULT_SECTORS_FILE = BACKEND_DIR / "data" / "course_sectors.json"
-
-
-def configure_mongodb_uri_for_seed() -> None:
-    load_dotenv()
-    mongodb_uri = os.getenv("MONGODB_URI")
-    if mongodb_uri is None or Path("/.dockerenv").exists():
-        return
-
-    os.environ["MONGODB_URI"] = mongodb_uri.replace("@mongodb:", "@localhost:")
 
 
 async def upsert_documents(
@@ -54,7 +44,6 @@ async def seed_courses(
     sectors_file: Path,
     drop_existing: bool,
 ) -> None:
-    configure_mongodb_uri_for_seed()
     await init_database()
     try:
         raw_courses = json.loads(data_file.read_text(encoding="utf-8"))
