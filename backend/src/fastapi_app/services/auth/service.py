@@ -2,8 +2,8 @@ from db.models.auth_session import AuthSession
 from fastapi import HTTPException, status
 
 from fastapi_app.schemas.auth import LoginRequest, SessionResponse, SignupRequest
-from fastapi_app.security import verify_password
-from fastapi_app.services.auth_sessions import end_session, start_session
+from fastapi_app.services.auth.security import verify_password
+from fastapi_app.services.auth.sessions import end_session, start_session
 from fastapi_app.services.settings import create_user_settings
 from fastapi_app.services.users import (
     create_user,

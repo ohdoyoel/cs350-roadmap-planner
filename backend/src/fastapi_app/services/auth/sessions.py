@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from fastapi import HTTPException, status
 
 from db.models.auth_session import AuthSession
-from fastapi_app.security import (
+from fastapi_app.services.auth.security import (
     create_session_token,
     get_session_idle_timeout_minutes,
     hash_session_token,
