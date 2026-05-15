@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from fastapi_app.schemas.auth import LoginRequest, SignupRequest
-from fastapi_app.security import (
+from fastapi_app.services.auth.security import (
     create_session_token,
     get_session_idle_timeout_minutes,
     hash_password,

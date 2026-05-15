@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from db.models.user import User
 from db.models.user_settings import UserSettings
 from fastapi_app.schemas.users import UserDTO, UserWithSettingsDTO
-from fastapi_app.security import hash_password
+from fastapi_app.services.auth.security import hash_password
 from fastapi_app.services.settings import serialize_settings
 
 

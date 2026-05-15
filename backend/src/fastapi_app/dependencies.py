@@ -3,7 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from db.models.auth_session import AuthSession
 from db.models.user import User
-from fastapi_app.services.auth_sessions import validate_session
+from fastapi_app.services.auth.sessions import validate_session
 from fastapi_app.services.users import get_user_by_id
 
 bearer_scheme = HTTPBearer(auto_error=False)
