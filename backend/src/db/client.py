@@ -7,7 +7,10 @@ from pymongo import AsyncMongoClient
 from db.models.course import Course
 from db.models.course_category import CourseCategory
 from db.models.course_sector import CourseSector
+from db.models.auth_session import AuthSession
 from db.models.example import Example
+from db.models.user import User
+from db.models.user_settings import UserSettings
 
 _client: AsyncMongoClient | None = None
 
@@ -49,7 +52,15 @@ async def init_database() -> None:
     _client = AsyncMongoClient(get_mongodb_uri())
     await init_beanie(
         database=_client[get_mongodb_database()],
-        document_models=[Course, CourseCategory, CourseSector, Example],
+        document_models=[
+            AuthSession,
+            Course,
+            CourseCategory,
+            CourseSector,
+            Example,
+            User,
+            UserSettings,
+        ],
     )
 
 
