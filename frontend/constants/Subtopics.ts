@@ -87,3 +87,11 @@ export const SUBTOPIC_ORDER: SubtopicId[] = [
   'social_computing',
   'interactive_computing',
 ];
+
+const KO_TO_ID: Record<string, SubtopicId> = Object.fromEntries(
+  SUBTOPIC_ORDER.map((id) => [SUBTOPICS[id].label_ko, id]),
+);
+
+export function subtopicIdFromKo(label: string): SubtopicId | undefined {
+  return KO_TO_ID[label];
+}
