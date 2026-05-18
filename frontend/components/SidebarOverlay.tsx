@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -15,14 +15,22 @@ import { CATEGORIES } from '@/constants/Categories';
 import { SUBTOPICS } from '@/constants/Subtopics';
 import { type ApiCourse, listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
+import { useFocus } from '@/lib/discover/FocusContext';
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
 import { useSidebar } from '@/lib/sidebar/SidebarContext';
+import { useCart } from '@/lib/timetable/CartContext';
 
 const PANEL_WIDTH = 400;
 const ANIM_DURATION = 220;
 
+// AppHeader 영역(상단)과 CustomTabBar 영역(하단) 이 보이도록 패널 inset.
+const TOP_INSET = 72;
+const BOTTOM_INSET = 96;
+
 export function SidebarOverlay() {
   const { isOpen, close } = useSidebar();
+  const { setFocus } = useFocus();
+  const { addToCart } = useCart();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
   const [selectedSubtopic, setSelectedSubtopic] = useState<SubtopicId | null>(null);
@@ -60,17 +68,13 @@ export function SidebarOverlay() {
 
   return (
     <View pointerEvents={isOpen ? 'auto' : 'none'} style={StyleSheet.absoluteFill}>
+      {/* 헤더/탭 영역 등 패널 바깥을 누르면 닫힘 */}
+      <Pressable
+        onPress={close}
+        style={StyleSheet.absoluteFill}
+        accessibilityLabel="Close sidebar"
+      />
       <Animated.View style={[styles.panel, panelStyle]}>
-        <View style={styles.headerRow}>
-          <Pressable
-            onPress={close}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel="Close sidebar"
-          >
-            <Ionicons name="close" size={22} color="#111" />
-          </Pressable>
-        </View>
         <View style={styles.searchWrap}>
           <SearchInput value={searchText} onChange={setSearchText} />
         </View>
@@ -105,10 +109,17 @@ export function SidebarOverlay() {
           <CourseDetailPanel
             course={selectedCourse}
             onClose={() => setSelectedCourse(null)}
-            onAddToPlanned={() => setSelectedCourse(null)}
-            onFindInTree={() => {
+            onAddToPlanned={() => {
+              addToCart(selectedCourse.courseCode);
               setSelectedCourse(null);
               close();
+              router.push('/timetable');
+            }}
+            onFindInTree={() => {
+              setFocus(selectedCourse);
+              setSelectedCourse(null);
+              close();
+              router.push('/');
             }}
           />
         </View>
@@ -139,31 +150,30 @@ function CategoryHeader({ id, onClear }: { id: CategoryId; onClear: () => void }
 const styles = StyleSheet.create({
   panel: {
     position: 'absolute',
-    top: 0,
+    top: TOP_INSET,
     right: 0,
-    bottom: 0,
+    bottom: BOTTOM_INSET,
     width: PANEL_WIDTH,
     backgroundColor: '#fff',
-  },
-  headerRow: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    overflow: 'hidden',
   },
   searchWrap: {
     paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 12,
   },
   body: {
     paddingHorizontal: 16,
-    paddingBottom: 120,
+    paddingBottom: 24,
     gap: 14,
   },
   results: {
     paddingHorizontal: 16,
-    paddingBottom: 120,
+    paddingBottom: 24,
     gap: 10,
   },
   empty: {
@@ -190,9 +200,9 @@ const styles = StyleSheet.create({
   headerDot: { width: 10, height: 10, borderRadius: 5 },
   detailWrap: {
     position: 'absolute',
-    top: 56,
+    top: TOP_INSET + 8,
     left: 12,
     right: 12,
-    bottom: 24,
+    bottom: BOTTOM_INSET + 8,
   },
 });

@@ -1,14 +1,21 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SUBTOPICS, subtopicIdFromKo } from '@/constants/Subtopics';
 import type { ApiCourse } from '@/lib/api/courses';
+import { useFocus } from '@/lib/discover/FocusContext';
 
 type Props = {
   course: ApiCourse;
 };
 
 export function CourseCard({ course }: Props) {
+  const { focus } = useFocus();
+  const isFocused = focus?.code === course.courseCode;
   const semesterLabel = course.offeredSemesters.join('/');
-  const cardStyle = [styles.card, course.isKeyCourse && styles.cardKey];
+  const cardStyle = [
+    styles.card,
+    course.isKeyCourse && styles.cardKey,
+    isFocused && styles.cardFocused,
+  ];
   return (
     <View style={cardStyle}>
       <View style={styles.header}>
@@ -44,8 +51,11 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   cardKey: {
-    borderStyle: 'dashed',
     borderColor: '#92400e',
+  },
+  cardFocused: {
+    backgroundColor: '#d1d5db',
+    borderColor: '#6b7280',
   },
   header: {
     flexDirection: 'row',

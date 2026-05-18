@@ -474,6 +474,9 @@ export function TreeCanvas({
     // gap 안에서 horizontal은 10px 간격으로 stacked. gap 높이 = (slotCount + 1) * 10.
     const SLOT_SPACING = 10;
     const MIN_GAP = 16;
+    // 마지막 slot 과 다음 row top 사이에 확보할 vertical entry 길이.
+    // CORNER_RADIUS(16) 보다 충분히 크게 잡아 진입 직선이 시각적으로 드러나도록.
+    const ENTRY_RESERVE = 22;
     const numGaps = Math.max(0, rows.length - 1);
 
     type Req = {
@@ -547,8 +550,11 @@ export function TreeCanvas({
       gapSlotCount[gap] = groups.length;
     });
 
+    // 각 gap height = max(MIN_GAP, count*SLOT_SPACING + ENTRY_RESERVE).
+    // slot 0..count-1 은 gapTop + (k+1)*SLOT_SPACING 에 배치. 마지막 slot 과
+    // 다음 row top 사이가 ENTRY_RESERVE 만큼 확보되어 진입 직선이 보장된다.
     const gapVSep: number[] = gapSlotCount.map((n) =>
-      Math.max(MIN_GAP, (n + 1) * SLOT_SPACING),
+      Math.max(MIN_GAP, n * SLOT_SPACING + ENTRY_RESERVE),
     );
 
     // row y 재계산 (dynamic per-gap vSep). row.y 와 positions의 y 업데이트.
@@ -651,6 +657,9 @@ export function TreeCanvas({
 
       const pr = rowIdxById.get(e.from)!;
       const cr = rowIdxById.get(e.to)!;
+
+      // 도착은 무조건 위에서 들어와야 하므로 backward / 같은 row 엣지는 그리지 않는다.
+      if (cr <= pr) return;
 
       // 같은 column 인접 row → 직선
       if (cr - pr === 1 && Math.abs(fromX - toX) < 0.5) {
