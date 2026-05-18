@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/AppHeader';
@@ -10,25 +10,18 @@ import { SemesterRow } from '@/components/timetable/SemesterRow';
 import { UNPLACED_LIST_ID, UnplacedCourseRow } from '@/components/timetable/UnplacedCourseRow';
 import { categoryIdFromKo } from '@/constants/Categories';
 import { subtopicIdFromKo } from '@/constants/Subtopics';
-import { DnDProvider, type DragInfo } from '@/hooks/useDnD';
+import { DnDProvider } from '@/hooks/useDnD';
 import { type ApiCourse, listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
 import {
   type FilterMode,
   SEMESTERS,
   type TimetableCard,
-  UNPLACED_CARDS,
 } from '@/lib/mocks/timetableFixture';
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
+import { useCart } from '@/lib/timetable/CartContext';
 
 type CardLists = Record<string, TimetableCard[]>;
-
-function initialLists(): CardLists {
-  return {
-    [UNPLACED_LIST_ID]: UNPLACED_CARDS,
-    ...Object.fromEntries(SEMESTERS.map((s) => [s.id, s.cards])),
-  };
-}
 
 function isCardVisible(
   card: TimetableCard,
@@ -52,7 +45,7 @@ export default function Timetable() {
   const [mode, setMode] = useState<FilterMode>('grade');
   const [gradeChip, setGradeChip] = useState<CategoryId | null>(null);
   const [subjectChip, setSubjectChip] = useState<SubtopicId | null>(null);
-  const [lists, setLists] = useState<CardLists>(initialLists);
+  const { lists, handleDrop } = useCart();
 
   const { data: courses, loading, error } = useApi(() => listCourses(), []);
 
@@ -70,34 +63,6 @@ export default function Timetable() {
     }
     return out;
   }, [lists, courseByCode, mode, gradeChip, subjectChip]);
-
-  const handleDrop = useCallback(
-    (toListId: string, toIndex: number, drag: DragInfo) => {
-      setLists((prev) => {
-        const fromList = prev[drag.fromListId];
-        if (!fromList) return prev;
-        const card = fromList.find((c) => c.id === drag.cardId);
-        if (!card) return prev;
-
-        const remaining = fromList.filter((c) => c.id !== drag.cardId);
-
-        if (drag.fromListId === toListId) {
-          // same-list reorder
-          const fromIndex = fromList.findIndex((c) => c.id === drag.cardId);
-          // splice 후 인덱스 보정: 같은 list 에서 fromIndex 보다 뒤로 옮길 때는 -1
-          const adjusted = fromIndex < toIndex ? toIndex - 1 : toIndex;
-          const next = [...remaining];
-          next.splice(adjusted, 0, card);
-          return { ...prev, [toListId]: next };
-        }
-
-        const toNext = [...(prev[toListId] ?? [])];
-        toNext.splice(toIndex, 0, card);
-        return { ...prev, [drag.fromListId]: remaining, [toListId]: toNext };
-      });
-    },
-    [],
-  );
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

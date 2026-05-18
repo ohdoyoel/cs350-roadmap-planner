@@ -55,14 +55,6 @@ export type TimetableCard = {
   variant?: TimetableCardVariant;
 };
 
-// Sticky top — 아직 어느 학기에도 배치 안 된 과목들.
-export const UNPLACED_CARDS: TimetableCard[] = [
-  { id: 'u-cs202', code: 'CS202', variant: 'small' },
-  { id: 'u-cs322', code: 'CS322', variant: 'small' },
-  { id: 'u-mas110', code: 'MAS110', variant: 'small' },
-  { id: 'u-cs376', code: 'CS376', variant: 'small' },
-];
-
 export type SemesterStatus = 'past' | 'current' | 'future';
 
 export type Semester = {
