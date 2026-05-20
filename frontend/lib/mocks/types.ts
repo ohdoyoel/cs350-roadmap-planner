@@ -5,7 +5,9 @@ export type CategoryId =
   | 'general_required'
   | 'general_elective'
   | 'major_required'
-  | 'major_elective';
+  | 'major_elective'
+  | 'graduation_research'
+  | 'other';
 
 export type SubtopicId =
   | 'data_science'

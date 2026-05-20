@@ -68,24 +68,42 @@ export const FILTER_CHIPS: { id: FilterChipId; label_en: string }[] = [
 
 export type CourseListEntryStatus = 'completed' | 'planned' | 'not_taken';
 
-export type CourseListEntry = {
+// 사용자가 수강했거나 계획 중인 과목의 상태. 점수·이수 여부는 backend 에 아직 없으니 mock.
+// code 만 식별자로 두고 name_en / credit 은 GET /courses 결과에서 join 한다.
+export type UserCourseState = {
   code: string;
-  name_en: string;
-  credit: number;
   status: CourseListEntryStatus;
   grade?: Grade;
   gpaPoint?: number;
   plannedAddition?: number;
 };
 
-// Figure 1 Detailed Course List
-export const COURSE_LIST: CourseListEntry[] = [
-  { code: 'CS206', name_en: 'Discrete Math', credit: 3, status: 'completed', grade: 'A+', gpaPoint: 4.3 },
-  { code: 'CS220', name_en: 'Computer Architecture', credit: 3, status: 'completed', grade: 'A0', gpaPoint: 3.7 },
-  { code: 'CS230', name_en: 'System Programming', credit: 3, status: 'completed', grade: 'A+', gpaPoint: 4.3 },
-  { code: 'CS360', name_en: 'Artificial Intelligence', credit: 3, status: 'planned', plannedAddition: 3 },
-  { code: 'CS454', name_en: 'Networks', credit: 3, status: 'not_taken' },
+export const USER_COURSE_STATES: UserCourseState[] = [
+  { code: 'CS101', status: 'completed', grade: 'A+', gpaPoint: 4.3 },
+  { code: 'CS109', status: 'completed', grade: 'A0', gpaPoint: 3.7 },
+  { code: 'MAS109', status: 'completed', grade: 'B+', gpaPoint: 3.3 },
+  { code: 'CS204', status: 'completed', grade: 'A+', gpaPoint: 4.3 },
+  { code: 'CS206', status: 'completed', grade: 'A+', gpaPoint: 4.3 },
+  { code: 'CS220', status: 'completed', grade: 'A0', gpaPoint: 3.7 },
+  { code: 'CS230', status: 'completed', grade: 'A+', gpaPoint: 4.3 },
+  { code: 'CS300', status: 'planned', plannedAddition: 3 },
+  { code: 'CS360', status: 'planned', plannedAddition: 3 },
+  { code: 'CS320', status: 'not_taken' },
+  { code: 'CS454', status: 'not_taken' },
 ];
+
+// CourseListItem 이 받는 join 결과 shape — code + name_en + credit + 카테고리 + 사용자 상태.
+// category 는 칩 필터링용 (활성 chip 과 매칭).
+export type CourseListEntry = {
+  code: string;
+  name_en: string;
+  credit: number;
+  category?: CategoryId;
+  status: CourseListEntryStatus;
+  grade?: Grade;
+  gpaPoint?: number;
+  plannedAddition?: number;
+};
 
 // Figure 3 Custom Credit Details
 export type CustomCreditEntry = {
