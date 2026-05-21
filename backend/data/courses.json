@@ -40,9 +40,7 @@
       "au": 0,
       "raw": "2:3:3(0)"
     },
-    "prerequisites": [
-      "CS101"
-    ],
+    "prerequisites": [],
     "is_key_course": false
   },
   {
