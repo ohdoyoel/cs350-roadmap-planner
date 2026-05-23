@@ -510,3 +510,294 @@ session token이 없거나 유효하지 않으면 `401`을 반환합니다.
   "created_at": "2026-05-04T11:59:56.677000"
 }
 ```
+
+## Roadmap API
+
+Roadmap API는 로그인한 사용자 자신의 학기별 과목 배치 상태를 관리합니다. 모든 endpoint는 Bearer session token 인증이 필요합니다.
+
+### 공통 개념
+
+| 이름 | 설명 |
+| --- | --- |
+| `semester` | API 외부에서는 `"1-1"`, `"1-2"`, `"2-1"` 형식의 문자열로 주고받습니다. 서버 내부와 DB에는 `1`, `2`, `3` 같은 정수 semester number로 저장합니다. |
+| `courseCode` | 과목 코드입니다. 서버 저장 시 대문자로 정규화합니다. |
+| `grade` | `PLANNED`, `A+`, `A0`, `A-`, `B+`, `B0`, `B-`, `C+`, `C0`, `C-`, `D+`, `D0`, `D-`, `F`, `S`, `U`, `R` 중 하나입니다. |
+| 과목 식별자 | roadmap 안의 과목은 `semester + courseCode` 조합으로 식별합니다. 같은 학기 같은 과목 중복은 금지하고, 다른 학기 같은 과목은 재수강으로 허용합니다. |
+
+### `GET /roadmap/me`
+
+현재 로그인한 사용자의 roadmap을 조회합니다. 사용자의 roadmap이 아직 없으면 빈 roadmap을 생성해서 반환합니다.
+
+#### Response `200`
+
+```json
+{
+  "id": "665000000000000000000001",
+  "userId": "665000000000000000000002",
+  "currentSemester": "1-1",
+  "courses": [
+    {
+      "type": "catalog",
+      "semester": "2-1",
+      "courseCode": "CS350",
+      "grade": "PLANNED"
+    }
+  ],
+  "createdAt": "2026-05-23T13:19:10.525Z",
+  "updatedAt": "2026-05-23T13:19:10.525Z"
+}
+```
+
+### `PATCH /roadmap/me/current-semester`
+
+현재 학기를 변경합니다.
+
+#### Query Params
+
+| 이름 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `semester` | string | 예 | 현재 학기. 예: `2-1` |
+
+#### Example
+
+```http
+PATCH /roadmap/me/current-semester?semester=2-1
+Authorization: Bearer <sessionToken>
+```
+
+#### Response `200`
+
+수정 후 전체 `RoadmapDTO`를 반환합니다.
+
+### `POST /roadmap/me/courses`
+
+roadmap에 과목을 추가합니다.
+
+#### Request Body: catalog course
+
+```json
+{
+  "type": "catalog",
+  "semester": "2-1",
+  "courseCode": "CS350",
+  "grade": "PLANNED"
+}
+```
+
+`type = "catalog"`인 경우 `courseCode`는 `courses` 컬렉션에 존재해야 합니다. 존재하지 않으면 `404`를 반환합니다.
+
+#### Request Body: custom course
+
+Custom course를 위한 shape도 schema에 포함되어 있습니다.
+
+```json
+{
+  "type": "custom",
+  "semester": "3-1",
+  "courseCode": "CUSTOM001",
+  "title": "Exchange Course",
+  "credit": 3,
+  "category": "전공선택",
+  "grade": "PLANNED"
+}
+```
+
+#### Response `200`
+
+추가 후 전체 `RoadmapDTO`를 반환합니다.
+
+#### Error
+
+| 상태 코드 | 설명 |
+| --- | --- |
+| `404` | catalog course가 `courses` 컬렉션에 없음 |
+| `409` | 같은 학기에 같은 `courseCode`가 이미 있음 |
+
+### `POST /roadmap/me/courses/move`
+
+과목을 다른 학기로 이동합니다.
+
+#### Query Params
+
+| 이름 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `courseCode` | string | 예 | 이동할 과목 코드 |
+| `fromSemester` | string | 예 | 기존 학기. 예: `2-1` |
+| `toSemester` | string | 예 | 이동할 학기. 예: `3-1` |
+
+#### Example
+
+```http
+POST /roadmap/me/courses/move?courseCode=CS350&fromSemester=2-1&toSemester=3-1
+Authorization: Bearer <sessionToken>
+```
+
+#### Response `200`
+
+이동 후 전체 `RoadmapDTO`를 반환합니다.
+
+### `PATCH /roadmap/me/courses/{semester}/{courseCode}/grade`
+
+특정 학기에 배치된 과목의 성적을 변경합니다.
+
+#### Path Params
+
+| 이름 | 타입 | 설명 |
+| --- | --- | --- |
+| `semester` | string | 과목이 배치된 학기. 예: `2-1` |
+| `courseCode` | string | 과목 코드 |
+
+#### Query Params
+
+| 이름 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `grade` | string | 예 | 변경할 성적 |
+
+#### Example
+
+```http
+PATCH /roadmap/me/courses/2-1/CS350/grade?grade=A0
+Authorization: Bearer <sessionToken>
+```
+
+#### Response `200`
+
+수정 후 전체 `RoadmapDTO`를 반환합니다.
+
+### `DELETE /roadmap/me/courses/{semester}/{courseCode}`
+
+특정 학기에 배치된 과목을 삭제합니다.
+
+#### Example
+
+```http
+DELETE /roadmap/me/courses/2-1/CS350
+Authorization: Bearer <sessionToken>
+```
+
+#### Response `200`
+
+삭제 후 전체 `RoadmapDTO`를 반환합니다.
+
+## Credit and GPA API
+
+Credit and GPA API는 roadmap을 기반으로 현재 학기 기준 학점, GPA, 졸업요건 진행 상황을 계산합니다. 계산 결과는 DB에 저장하지 않고 요청 시점에 산출합니다.
+
+### `GET /credit-gpa/me`
+
+현재 로그인한 사용자의 roadmap을 읽고, catalog course metadata와 조합해서 학점/GPA 요약을 반환합니다.
+
+#### Response `200`
+
+```json
+{
+  "currentSemester": "2-1",
+  "credits": {
+    "completed": 33,
+    "inProgress": 15,
+    "remaining": 27
+  },
+  "gpa": 3.61,
+  "requirements": [
+    {
+      "key": "basic",
+      "label": "기초",
+      "requiredCredits": 6,
+      "completedCredits": 3,
+      "inProgressCredits": 3,
+      "remainingCredits": 0
+    },
+    {
+      "key": "major_required",
+      "label": "전공필수",
+      "requiredCredits": 19,
+      "completedCredits": 12,
+      "inProgressCredits": 3,
+      "remainingCredits": 4
+    },
+    {
+      "key": "major_elective",
+      "label": "전공선택",
+      "requiredCredits": 30,
+      "completedCredits": 9,
+      "inProgressCredits": 6,
+      "remainingCredits": 15
+    },
+    {
+      "key": "graduation_research",
+      "label": "졸업연구",
+      "requiredCredits": 3,
+      "completedCredits": 0,
+      "inProgressCredits": 0,
+      "remainingCredits": 3
+    }
+  ],
+  "courses": [
+    {
+      "key": "basic",
+      "label": "기초",
+      "items": [
+        {
+          "type": "catalog",
+          "courseCode": "CS101",
+          "title": "Intro CS",
+          "titleEn": "Introduction to Computer Science",
+          "semester": "1-1",
+          "category": "기초필수",
+          "credit": 3,
+          "grade": "A0",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "key": "major_required",
+      "label": "전공필수",
+      "items": []
+    },
+    {
+      "key": "major_elective",
+      "label": "전공선택",
+      "items": [
+        {
+          "type": "catalog",
+          "courseCode": "CS350",
+          "title": "Software Engineering",
+          "titleEn": "Introduction to Software Engineering",
+          "semester": "2-1",
+          "category": "전공선택",
+          "credit": 3,
+          "grade": "PLANNED",
+          "status": "in_progress"
+        }
+      ]
+    },
+    {
+      "key": "graduation_research",
+      "label": "졸업연구",
+      "items": []
+    }
+  ]
+}
+```
+
+#### Field notes
+
+| 필드 | 설명 |
+| --- | --- |
+| `credits.completed` | 현재 학기 이전에 완료된 것으로 처리되는 학점 합계 |
+| `credits.inProgress` | 현재 학기에 배치된 과목 학점 합계 |
+| `credits.remaining` | 4개 requirement의 `remainingCredits` 합계 |
+| `gpa` | GPA 계산 대상 과목이 없으면 `null` |
+| `requirements` | 기초, 전공필수, 전공선택, 졸업연구 4개 고정 |
+| `courses` | 같은 4개 그룹으로 나뉜 전체 roadmap course 목록 |
+
+#### Course status
+
+| status | 의미 |
+| --- | --- |
+| `completed` | 현재 학기 이전 과목이고 성적이 입력됨 |
+| `missing_grade` | 현재 학기 이전 과목이지만 `grade = PLANNED`. 이수 학점에는 포함하고 GPA에서는 제외함 |
+| `in_progress` | 현재 학기 과목 |
+| `planned` | 현재 학기 이후 과목 |
+| `excluded` | `grade = R`. 학점, GPA, 요건 계산에서 제외함 |
