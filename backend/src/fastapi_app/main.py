@@ -5,8 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db.client import close_database, init_database, ping_database
 from fastapi_app.routers.auth import router as auth_router
+from fastapi_app.routers.credit_gpa import router as credit_gpa_router
 from fastapi_app.routers.courses import router as courses_router
 from fastapi_app.routers.examples import router as examples_router
+from fastapi_app.routers.roadmaps import router as roadmaps_router
 from fastapi_app.routers.users import router as users_router
 
 
@@ -33,8 +35,10 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(credit_gpa_router)
 app.include_router(courses_router)
 app.include_router(examples_router)
+app.include_router(roadmaps_router)
 app.include_router(users_router)
 
 
