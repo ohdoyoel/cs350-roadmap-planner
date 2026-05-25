@@ -1,14 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { CourseListEntry } from '@/lib/mocks/statusFixture';
 
 type Props = {
   entry: CourseListEntry;
+  onPress?: (entry: CourseListEntry) => void;
 };
 
-export function CourseListItem({ entry }: Props) {
+export function CourseListItem({ entry, onPress }: Props) {
+  const handlePress = onPress ? () => onPress(entry) : undefined;
   return (
-    <View style={styles.row}>
+    <Pressable
+      onPress={handlePress}
+      disabled={!handlePress}
+      style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+      accessibilityRole={handlePress ? 'button' : undefined}
+      accessibilityLabel={handlePress ? `${entry.code} 성적 변경` : undefined}
+    >
       <StatusDot status={entry.status} />
       <Text style={styles.code}>{entry.code}</Text>
       <Text style={styles.name} numberOfLines={1}>
@@ -32,7 +40,7 @@ export function CourseListItem({ entry }: Props) {
           <Text style={styles.creditText}>0 / {entry.credit} credits</Text>
         )}
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -60,6 +68,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     gap: 10,
+  },
+  rowPressed: {
+    backgroundColor: '#f3f4f6',
   },
   dot: {
     width: 18,

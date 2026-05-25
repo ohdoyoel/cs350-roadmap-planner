@@ -1,27 +1,27 @@
-import { router } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/AppHeader';
 import { CategoryChipRow } from '@/components/status/CategoryChipRow';
 import { CourseListItem } from '@/components/status/CourseListItem';
+import { GradePicker } from '@/components/status/GradePicker';
 import { RequirementProgressList } from '@/components/status/RequirementProgressList';
 import { SemesterPicker } from '@/components/status/SemesterPicker';
 import { SemesterTitle } from '@/components/status/SemesterTitle';
 import { StatTileGrid } from '@/components/status/StatTileGrid';
-import { categoryIdFromKo } from '@/constants/Categories';
-import { listCourses } from '@/lib/api/courses';
+import { getMyCreditGpa } from '@/lib/api/creditGpa';
+import type { ApiRoadmapGrade } from '@/lib/api/roadmap';
 import { useApi } from '@/lib/api/useApi';
-import {
-  type CourseListEntry,
-  CURRENT_SEMESTER_ID,
-  type FilterChipId,
-  REQUIREMENT_GROUPS,
-  SEMESTER_OPTIONS,
-  STAT_SUMMARY,
-  USER_COURSE_STATES,
-} from '@/lib/mocks/statusFixture';
+import { type CourseListEntry, type FilterChipId } from '@/lib/mocks/statusFixture';
 import type { CategoryId } from '@/lib/mocks/types';
+import {
+  buildSemesterOptions,
+  mapCourseEntries,
+  mapRequirementGroups,
+  mapStatSummary,
+} from '@/lib/status/mapping';
+import { useCart } from '@/lib/timetable/CartContext';
 
 // 'Others' 칩이 묶어 보여줄 카테고리 집합.
 const OTHERS_CATEGORIES = new Set<CategoryId>([
@@ -31,33 +31,42 @@ const OTHERS_CATEGORIES = new Set<CategoryId>([
 ]);
 
 export default function Status() {
+  const {
+    setCurrentSemester: setRoadmapCurrentSemester,
+    setCourseGrade,
+    roadmapVersion,
+  } = useCart();
   const [activeChip, setActiveChip] = useState<FilterChipId>('all');
-  const [semesterId, setSemesterId] = useState(CURRENT_SEMESTER_ID);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [focusTick, setFocusTick] = useState(0);
+  const [gradeTarget, setGradeTarget] = useState<CourseListEntry | null>(null);
 
-  const semester = useMemo(
-    () => SEMESTER_OPTIONS.find((s) => s.id === semesterId) ?? SEMESTER_OPTIONS[0],
-    [semesterId],
+  // 탭이 다시 focus 될 때마다 /credit-gpa/me 를 refetch.
+  useFocusEffect(
+    useCallback(() => {
+      setFocusTick((t) => t + 1);
+    }, []),
   );
 
-  const { data: courses, loading, error } = useApi(() => listCourses(), []);
+  const { data: creditGpa, loading, error } = useApi(
+    () => getMyCreditGpa(),
+    [roadmapVersion, focusTick],
+  );
 
-  const entries = useMemo<CourseListEntry[]>(() => {
-    const byCode = new Map((courses ?? []).map((c) => [c.courseCode, c]));
-    return USER_COURSE_STATES.map((state) => {
-      const course = byCode.get(state.code);
-      return {
-        code: state.code,
-        name_en: course?.courseNameEn ?? course?.courseName ?? state.code,
-        credit: course?.credit.credit ?? 0,
-        category: course ? categoryIdFromKo(course.category) : undefined,
-        status: state.status,
-        grade: state.grade,
-        gpaPoint: state.gpaPoint,
-        plannedAddition: state.plannedAddition,
-      };
-    });
-  }, [courses]);
+  const summary = useMemo(() => (creditGpa ? mapStatSummary(creditGpa) : null), [creditGpa]);
+  const groups = useMemo(
+    () => (creditGpa ? mapRequirementGroups(creditGpa) : []),
+    [creditGpa],
+  );
+  const entries = useMemo(
+    () => (creditGpa ? mapCourseEntries(creditGpa) : []),
+    [creditGpa],
+  );
+  const semesterOptions = useMemo(
+    () => buildSemesterOptions(creditGpa?.currentSemester ?? '1-1'),
+    [creditGpa?.currentSemester],
+  );
+  const semester = semesterOptions[0];
 
   const visibleEntries = useMemo(() => {
     if (activeChip === 'all') return entries;
@@ -73,40 +82,60 @@ export default function Status() {
       <AppHeader onLeftPress={() => router.push('/settings')}>
         <View style={styles.headerStack}>
           <Text style={styles.headerTitle}>Status</Text>
-          <SemesterTitle label={semester.label} onPress={() => setPickerOpen((v) => !v)} />
+          {semester ? (
+            <SemesterTitle label={semester.label} onPress={() => setPickerOpen((v) => !v)} />
+          ) : null}
         </View>
       </AppHeader>
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-        <StatTileGrid summary={STAT_SUMMARY} />
-        <Text style={styles.sectionLabel}>Requirement Progress</Text>
-        <RequirementProgressList groups={REQUIREMENT_GROUPS} />
-        <CategoryChipRow active={activeChip} onSelect={setActiveChip} />
-        <Text style={styles.sectionLabel}>Detailed Course List</Text>
-        {loading ? (
+        {loading || !summary ? (
           <ActivityIndicator />
         ) : error ? (
           <Text style={styles.errorText}>{error.message}</Text>
         ) : (
-          <View>
-            {visibleEntries.length === 0 ? (
-              <Text style={styles.emptyText}>해당 카테고리의 과목이 없습니다.</Text>
-            ) : (
-              visibleEntries.map((entry) => (
-                <CourseListItem key={entry.code} entry={entry} />
-              ))
-            )}
-          </View>
+          <>
+            <StatTileGrid summary={summary} />
+            <Text style={styles.sectionLabel}>Requirement Progress</Text>
+            <RequirementProgressList groups={groups} />
+            <CategoryChipRow active={activeChip} onSelect={setActiveChip} />
+            <Text style={styles.sectionLabel}>Detailed Course List</Text>
+            <View>
+              {visibleEntries.length === 0 ? (
+                <Text style={styles.emptyText}>해당 카테고리의 과목이 없습니다.</Text>
+              ) : (
+                visibleEntries.map((entry) => (
+                  <CourseListItem
+                    key={`${entry.semester}-${entry.code}`}
+                    entry={entry}
+                    onPress={setGradeTarget}
+                  />
+                ))
+              )}
+            </View>
+          </>
         )}
       </ScrollView>
-      {pickerOpen ? (
+      {pickerOpen && semester ? (
         <SemesterPicker
-          options={SEMESTER_OPTIONS}
-          selectedId={semesterId}
+          options={semesterOptions}
+          selectedId={semester.id}
           onSelect={(id) => {
-            setSemesterId(id);
             setPickerOpen(false);
+            void setRoadmapCurrentSemester(id);
           }}
           onClose={() => setPickerOpen(false)}
+        />
+      ) : null}
+      {gradeTarget ? (
+        <GradePicker
+          courseCode={`${gradeTarget.code} · ${gradeTarget.semester}`}
+          selectedGrade={gradeTarget.rawGrade as ApiRoadmapGrade}
+          onSelect={(grade) => {
+            const target = gradeTarget;
+            setGradeTarget(null);
+            void setCourseGrade(target.semester, target.code, grade);
+          }}
+          onClose={() => setGradeTarget(null)}
         />
       ) : null}
     </SafeAreaView>

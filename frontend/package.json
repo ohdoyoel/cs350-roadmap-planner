@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
     "@expo/vector-icons": "^15.0.3",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@types/dagre": "^0.7.54",
     "dagre": "^0.8.5",
     "expo": "~54.0.33",
