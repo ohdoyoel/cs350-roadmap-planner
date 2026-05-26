@@ -15,7 +15,6 @@ import { type ApiCourse, listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
 import {
   type FilterMode,
-  SEMESTERS,
   type TimetableCard,
 } from '@/lib/mocks/timetableFixture';
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
@@ -45,9 +44,15 @@ export default function Timetable() {
   const [mode, setMode] = useState<FilterMode>('grade');
   const [gradeChip, setGradeChip] = useState<CategoryId | null>(null);
   const [subjectChip, setSubjectChip] = useState<SubtopicId | null>(null);
-  const { lists, handleDrop } = useCart();
+  const { lists, semesters, handleDrop, loading: roadmapLoading, error: roadmapError } = useCart();
 
-  const { data: courses, loading, error } = useApi(() => listCourses(), []);
+  const { data: courses, loading: coursesLoading, error: coursesError } = useApi(
+    () => listCourses(),
+    [],
+  );
+
+  const loading = coursesLoading || roadmapLoading;
+  const error = coursesError ?? roadmapError;
 
   const courseByCode = useMemo<Map<string, ApiCourse>>(
     () => new Map((courses ?? []).map((c) => [c.courseCode, c])),
@@ -96,7 +101,7 @@ export default function Timetable() {
             contentContainerStyle={styles.body}
             showsVerticalScrollIndicator={false}
           >
-            {SEMESTERS.map((sem) => (
+            {semesters.map((sem) => (
               <SemesterRow
                 key={sem.id}
                 semester={sem}

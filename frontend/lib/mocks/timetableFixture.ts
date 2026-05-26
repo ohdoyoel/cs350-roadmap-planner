@@ -1,7 +1,6 @@
-// SRS Figure 9~14 (Semester Roadmap / Timetable) 화면 그대로의 mock data.
+// SRS Figure 9~14 (Semester Roadmap / Timetable) 화면 의 정적 메타데이터.
 // 카드의 메타(이름·카테고리·학점·sector dot)는 GET /courses 결과로 join 한다.
-// REQ-MAP-011 으로 Calculator (statusFixture) 와 동기화돼야 하나,
-// 1차 PR 에서는 정적 레이아웃만이라 fixture 끼리는 아직 분리.
+// 사용자가 배치한 과목은 GET /roadmap/me 에서 가져온다.
 
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
 
@@ -65,73 +64,34 @@ export type Semester = {
   cards: TimetableCard[];
 };
 
-export const SEMESTERS: Semester[] = [
-  {
-    id: '1-spring',
-    label: '1st Spring',
-    status: 'past',
-    bgColor: '#e0e7ff',
-    cards: [
-      { id: '1s-cs101', code: 'CS101', variant: 'big' },
-    ],
-  },
-  {
-    id: '1-fall',
-    label: '1st Fall',
-    status: 'past',
-    bgColor: '#dbeafe',
-    cards: [
-      { id: '1f-mas109', code: 'MAS109', variant: 'big' },
-      { id: '1f-cs206', code: 'CS206', variant: 'big' },
-    ],
-  },
-  {
-    id: '2-spring',
-    label: '2nd Spring',
-    status: 'past',
-    bgColor: '#cffafe',
-    cards: [
-      { id: '2s-cs300', code: 'CS300', variant: 'big' },
-      { id: '2s-cs361', code: 'CS361', variant: 'big' },
-    ],
-  },
-  {
-    id: '2-fall',
-    label: '2nd Fall',
-    status: 'current',
-    bgColor: '#fce7f3',
-    cards: [
-      { id: '2f-cs360', code: 'CS360', variant: 'big' },
-    ],
-  },
-  {
-    id: '3-spring',
-    label: '3rd Spring',
-    status: 'future',
-    bgColor: '#fef3c7',
-    cards: [],
-  },
-  {
-    id: '3-fall',
-    label: '3rd Fall',
-    status: 'future',
-    bgColor: '#ffedd5',
-    cards: [],
-  },
-  {
-    id: '4-spring',
-    label: '4th Spring',
-    status: 'future',
-    bgColor: '#d1fae5',
-    cards: [
-      { id: '4s-cs350', code: 'CS350', variant: 'big' },
-    ],
-  },
-  {
-    id: '4-fall',
-    label: '4th Fall',
-    status: 'future',
-    bgColor: '#fbcfe8',
-    cards: [],
-  },
+// 학기 슬롯 메타데이터. backend semester format ("<year>-<term>") 와 동일.
+export type SemesterSlot = {
+  id: string;
+  label: string;
+  bgColor: string;
+};
+
+export const SEMESTER_SLOTS: SemesterSlot[] = [
+  { id: '1-1', label: '1st Spring', bgColor: '#e0e7ff' },
+  { id: '1-2', label: '1st Fall', bgColor: '#dbeafe' },
+  { id: '2-1', label: '2nd Spring', bgColor: '#cffafe' },
+  { id: '2-2', label: '2nd Fall', bgColor: '#fce7f3' },
+  { id: '3-1', label: '3rd Spring', bgColor: '#fef3c7' },
+  { id: '3-2', label: '3rd Fall', bgColor: '#ffedd5' },
+  { id: '4-1', label: '4th Spring', bgColor: '#d1fae5' },
+  { id: '4-2', label: '4th Fall', bgColor: '#fbcfe8' },
 ];
+
+export function semesterToNumber(id: string): number {
+  const [yr, term] = id.split('-').map(Number);
+  if (!Number.isFinite(yr) || !Number.isFinite(term)) return 1;
+  return (yr - 1) * 2 + term;
+}
+
+export function deriveSemesterStatus(id: string, currentId: string): SemesterStatus {
+  const n = semesterToNumber(id);
+  const c = semesterToNumber(currentId);
+  if (n < c) return 'past';
+  if (n === c) return 'current';
+  return 'future';
+}
