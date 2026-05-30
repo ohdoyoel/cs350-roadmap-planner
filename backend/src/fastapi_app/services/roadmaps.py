@@ -13,6 +13,7 @@ from db.models.roadmap import (
 from fastapi_app.schemas.roadmaps import (
     CatalogRoadmapCourseDTO,
     CustomRoadmapCourseDTO,
+    RoadmapPrerequisiteWarningDTO,
     RoadmapCourseDTO,
     RoadmapDTO,
 )
@@ -46,7 +47,54 @@ def serialize_course_item(course: RoadmapCourse) -> RoadmapCourseDTO:
     )
 
 
-def serialize_roadmap(roadmap: Roadmap) -> RoadmapDTO:
+async def load_catalog_courses_by_code(course_codes: set[str]) -> dict[str, Course]:
+    if not course_codes:
+        return {}
+    courses = await Course.find({"course_code": {"$in": sorted(course_codes)}}).to_list()
+    return {course.course_code: course for course in courses}
+
+
+async def get_prerequisite_warnings(
+    roadmap: Roadmap,
+) -> list[RoadmapPrerequisiteWarningDTO]:
+    catalog_codes = {
+        course.course_code
+        for course in roadmap.courses
+        if course.type == "catalog"
+    }
+    catalog_courses = await load_catalog_courses_by_code(catalog_codes)
+    placed_semesters = {
+        course.course_code: course.semester_number
+        for course in roadmap.courses
+    }
+
+    warnings: set[tuple[str, str]] = set()
+    for course in roadmap.courses:
+        if course.type != "catalog":
+            continue
+
+        catalog_course = catalog_courses.get(course.course_code)
+        if catalog_course is None:
+            continue
+
+        for prerequisite_code in catalog_course.prerequisites:
+            prerequisite_semester = placed_semesters.get(prerequisite_code)
+            if (
+                prerequisite_semester is None
+                or prerequisite_semester >= course.semester_number
+            ):
+                warnings.add((course.course_code, prerequisite_code))
+
+    return [
+        RoadmapPrerequisiteWarningDTO(
+            course_code=course_code,
+            required_course_code=required_course_code,
+        )
+        for course_code, required_course_code in sorted(warnings)
+    ]
+
+
+async def serialize_roadmap(roadmap: Roadmap) -> RoadmapDTO:
     return RoadmapDTO(
         id=str(roadmap.id),
         user_id=roadmap.user_id,
@@ -58,6 +106,7 @@ def serialize_roadmap(roadmap: Roadmap) -> RoadmapDTO:
                 key=lambda item: (item.semester_number, item.course_code),
             )
         ],
+        warnings=await get_prerequisite_warnings(roadmap),
         created_at=roadmap.created_at,
         updated_at=roadmap.updated_at,
     )
@@ -78,7 +127,7 @@ async def get_or_create_user_roadmap(user_id: str) -> Roadmap:
 
 
 async def get_my_roadmap(user_id: str) -> RoadmapDTO:
-    return serialize_roadmap(await get_or_create_user_roadmap(user_id))
+    return await serialize_roadmap(await get_or_create_user_roadmap(user_id))
 
 
 async def update_current_semester(
@@ -89,7 +138,7 @@ async def update_current_semester(
     roadmap.current_semester_number = semester_number
     roadmap.updated_at = now_utc()
     await roadmap.save()
-    return serialize_roadmap(roadmap)
+    return await serialize_roadmap(roadmap)
 
 
 def ensure_course_slot_available(
@@ -106,10 +155,10 @@ def ensure_course_slot_available(
         )
         if same_original:
             continue
-        if course.semester_number == semester_number and course.course_code == course_code:
+        if course.course_code == course_code:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Course already exists in this semester",
+                detail="Course already exists in this roadmap",
             )
 
 
@@ -154,7 +203,7 @@ async def add_course(user_id: str, course: RoadmapCourseDTO) -> RoadmapDTO:
 
     roadmap.updated_at = now_utc()
     await roadmap.save()
-    return serialize_roadmap(roadmap)
+    return await serialize_roadmap(roadmap)
 
 
 def find_course_index(
@@ -201,7 +250,7 @@ async def move_course(
     roadmap.courses[index] = course
     roadmap.updated_at = now_utc()
     await roadmap.save()
-    return serialize_roadmap(roadmap)
+    return await serialize_roadmap(roadmap)
 
 
 async def update_course_grade(
@@ -217,7 +266,7 @@ async def update_course_grade(
     roadmap.courses[index] = course
     roadmap.updated_at = now_utc()
     await roadmap.save()
-    return serialize_roadmap(roadmap)
+    return await serialize_roadmap(roadmap)
 
 
 async def delete_course(
@@ -230,4 +279,4 @@ async def delete_course(
     del roadmap.courses[index]
     roadmap.updated_at = now_utc()
     await roadmap.save()
-    return serialize_roadmap(roadmap)
+    return await serialize_roadmap(roadmap)

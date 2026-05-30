@@ -65,13 +65,13 @@ type = "custom"
 Roadmap 안에서 과목 item의 식별자는 별도 `roadmap_course_id`가 아니라 다음 조합이다.
 
 ```txt
-semester_number + course_code
+course_code
 ```
 
 결정 이유:
 
-- 같은 학기에 같은 과목을 두 번 들을 일은 없으므로 같은 학기 내 `course_code` 중복을 금지한다.
-- 다른 학기의 같은 `course_code`는 재수강으로 허용한다.
+- 같은 roadmap 안에 같은 `course_code`를 중복 배치할 수 없으므로 roadmap 전체에서 `course_code` 중복을 금지한다.
+- 재수강은 기존 과목 배치를 이동/수정하는 방식으로 처리한다.
 - 이동, 삭제, 성적 변경 API는 모두 기존 학기와 course code로 특정 item을 찾는다.
 
 예:
@@ -80,6 +80,24 @@ semester_number + course_code
 DELETE /roadmap/me/courses/2-1/CS350
 PATCH /roadmap/me/courses/2-1/CS350/grade?grade=A0
 ```
+
+## Prerequisite warnings
+
+`RoadmapDTO`는 현재 roadmap 상태의 선수과목 경고를 `warnings`로 함께 반환한다.
+
+```json
+{
+  "courseCode": "CS350",
+  "requiredCourseCode": "CS206"
+}
+```
+
+경고 조건:
+
+- `requiredCourseCode`가 roadmap에 배치되어 있지 않다.
+- `requiredCourseCode`가 `courseCode`와 같은 학기 또는 더 늦은 학기에 배치되어 있다.
+
+경고는 저장을 막지 않는다. `POST /roadmap/me/courses`, `POST /roadmap/me/courses/move`, `DELETE /roadmap/me/courses/{semester}/{courseCode}` 등 roadmap을 반환하는 API는 저장 후 상태를 기준으로 같은 warning 구조를 내려준다.
 
 ## Semester representation
 
@@ -124,13 +142,11 @@ D+, D0, D-
 F
 S
 U
-R
 ```
 
 의미:
 
 - `PLANNED`: 아직 성적이 입력되지 않은 상태.
-- `R`: 재수강 등으로 이전 기록을 계산에서 제외할 때 사용한다.
 - `S`, `U`: GPA에는 포함하지 않는 pass/fail 계열 성적이다.
 
 ## Course status policy
@@ -139,7 +155,6 @@ Credit/GPA API는 `current_semester_number`를 기준으로 course status를 계
 
 | 조건 | status | 계산 정책 |
 | --- | --- | --- |
-| `grade = R` | `excluded` | 학점, GPA, 졸업요건 계산에서 모두 제외 |
 | `semester_number = current_semester_number` | `in_progress` | 현재 수강중 학점으로 계산 |
 | `semester_number > current_semester_number` | `planned` | 현재 학점/요건 계산에는 포함하지 않음 |
 | `semester_number < current_semester_number` and `grade = PLANNED` | `missing_grade` | 이수 학점과 요건에는 포함, GPA에는 제외 |
@@ -178,7 +193,6 @@ F  0.0
 - `PLANNED`
 - `S`
 - `U`
-- `R`
 - `missing_grade`
 - `in_progress`
 - `planned`
