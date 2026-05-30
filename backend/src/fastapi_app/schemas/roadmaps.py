@@ -116,6 +116,13 @@ RoadmapCourseDTO = Annotated[
 ]
 
 
+class RoadmapPrerequisiteWarningDTO(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    course_code: str = Field(serialization_alias="courseCode")
+    required_course_code: str = Field(serialization_alias="requiredCourseCode")
+
+
 class RoadmapDTO(BaseModel):
     model_config = ConfigDict(
         populate_by_name=True,
@@ -125,6 +132,7 @@ class RoadmapDTO(BaseModel):
                 "userId": "665000000000000000000002",
                 "currentSemester": "1-1",
                 "courses": [],
+                "warnings": [],
                 "createdAt": "2026-05-23T13:19:10.525Z",
                 "updatedAt": "2026-05-23T13:19:10.525Z",
             },
@@ -138,6 +146,7 @@ class RoadmapDTO(BaseModel):
         serialization_alias="currentSemester",
     )
     courses: list[RoadmapCourseDTO]
+    warnings: list[RoadmapPrerequisiteWarningDTO] = Field(default_factory=list)
     created_at: datetime = Field(serialization_alias="createdAt")
     updated_at: datetime = Field(serialization_alias="updatedAt")
 

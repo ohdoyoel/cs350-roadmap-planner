@@ -81,6 +81,24 @@ DELETE /roadmap/me/courses/2-1/CS350
 PATCH /roadmap/me/courses/2-1/CS350/grade?grade=A0
 ```
 
+## Prerequisite warnings
+
+`RoadmapDTO`는 현재 roadmap 상태의 선수과목 경고를 `warnings`로 함께 반환한다.
+
+```json
+{
+  "courseCode": "CS350",
+  "requiredCourseCode": "CS206"
+}
+```
+
+경고 조건:
+
+- `requiredCourseCode`가 roadmap에 배치되어 있지 않다.
+- `requiredCourseCode`가 `courseCode`와 같은 학기 또는 더 늦은 학기에 배치되어 있다.
+
+경고는 저장을 막지 않는다. `POST /roadmap/me/courses`, `POST /roadmap/me/courses/move`, `DELETE /roadmap/me/courses/{semester}/{courseCode}` 등 roadmap을 반환하는 API는 저장 후 상태를 기준으로 같은 warning 구조를 내려준다.
+
 ## Semester representation
 
 API 외부와 프론트에서는 학기를 `"1-1"`, `"1-2"`, `"2-1"` 형식의 문자열로 주고받는다.

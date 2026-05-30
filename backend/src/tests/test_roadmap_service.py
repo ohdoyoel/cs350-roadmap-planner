@@ -123,6 +123,10 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
                 "fastapi_app.services.roadmaps.ensure_catalog_course_exists",
                 new=AsyncMock(),
             ) as ensure_exists,
+            patch(
+                "fastapi_app.services.roadmaps.get_prerequisite_warnings",
+                new=AsyncMock(return_value=[]),
+            ),
         ):
             result = await roadmap_service.add_course("user-id", course)
 
@@ -165,9 +169,15 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
             [CatalogRoadmapCourse(semester_number=3, course_code="CS350")],
         )
 
-        with patch(
-            "fastapi_app.services.roadmaps.get_or_create_user_roadmap",
-            new=AsyncMock(return_value=roadmap),
+        with (
+            patch(
+                "fastapi_app.services.roadmaps.get_or_create_user_roadmap",
+                new=AsyncMock(return_value=roadmap),
+            ),
+            patch(
+                "fastapi_app.services.roadmaps.get_prerequisite_warnings",
+                new=AsyncMock(return_value=[]),
+            ),
         ):
             result = await roadmap_service.move_course("user-id", "cs350", 3, 5)
 
@@ -180,9 +190,15 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
             [CatalogRoadmapCourse(semester_number=3, course_code="CS350")],
         )
 
-        with patch(
-            "fastapi_app.services.roadmaps.get_or_create_user_roadmap",
-            new=AsyncMock(return_value=roadmap),
+        with (
+            patch(
+                "fastapi_app.services.roadmaps.get_or_create_user_roadmap",
+                new=AsyncMock(return_value=roadmap),
+            ),
+            patch(
+                "fastapi_app.services.roadmaps.get_prerequisite_warnings",
+                new=AsyncMock(return_value=[]),
+            ),
         ):
             result = await roadmap_service.update_course_grade(
                 "user-id",
@@ -203,9 +219,15 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
             ],
         )
 
-        with patch(
-            "fastapi_app.services.roadmaps.get_or_create_user_roadmap",
-            new=AsyncMock(return_value=roadmap),
+        with (
+            patch(
+                "fastapi_app.services.roadmaps.get_or_create_user_roadmap",
+                new=AsyncMock(return_value=roadmap),
+            ),
+            patch(
+                "fastapi_app.services.roadmaps.get_prerequisite_warnings",
+                new=AsyncMock(return_value=[]),
+            ),
         ):
             result = await roadmap_service.delete_course("user-id", 3, "CS350")
 
@@ -213,6 +235,82 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(roadmap.courses), 1)
         self.assertEqual(roadmap.courses[0].course_code, "CS101")
         self.assertEqual(result.courses[0].course_code, "CS101")
+
+    async def test_prerequisite_warnings_include_missing_prerequisite(self) -> None:
+        roadmap = roadmap_with_courses(
+            [CatalogRoadmapCourse(semester_number=3, course_code="CS350")],
+        )
+        catalog_courses = {
+            "CS350": SimpleNamespace(
+                course_code="CS350",
+                prerequisites=["CS206"],
+            ),
+        }
+
+        with patch(
+            "fastapi_app.services.roadmaps.load_catalog_courses_by_code",
+            new=AsyncMock(return_value=catalog_courses),
+        ):
+            warnings = await roadmap_service.get_prerequisite_warnings(roadmap)
+
+        self.assertEqual(
+            [warning.model_dump(by_alias=True) for warning in warnings],
+            [{"courseCode": "CS350", "requiredCourseCode": "CS206"}],
+        )
+
+    async def test_prerequisite_warnings_include_same_or_later_prerequisite(self) -> None:
+        roadmap = roadmap_with_courses(
+            [
+                CatalogRoadmapCourse(semester_number=3, course_code="CS350"),
+                CatalogRoadmapCourse(semester_number=3, course_code="CS206"),
+                CatalogRoadmapCourse(semester_number=4, course_code="CS300"),
+            ],
+        )
+        catalog_courses = {
+            "CS350": SimpleNamespace(
+                course_code="CS350",
+                prerequisites=["CS206", "CS300"],
+            ),
+            "CS206": SimpleNamespace(course_code="CS206", prerequisites=[]),
+            "CS300": SimpleNamespace(course_code="CS300", prerequisites=[]),
+        }
+
+        with patch(
+            "fastapi_app.services.roadmaps.load_catalog_courses_by_code",
+            new=AsyncMock(return_value=catalog_courses),
+        ):
+            warnings = await roadmap_service.get_prerequisite_warnings(roadmap)
+
+        self.assertEqual(
+            [warning.model_dump(by_alias=True) for warning in warnings],
+            [
+                {"courseCode": "CS350", "requiredCourseCode": "CS206"},
+                {"courseCode": "CS350", "requiredCourseCode": "CS300"},
+            ],
+        )
+
+    async def test_prerequisite_warnings_ignore_prior_prerequisite(self) -> None:
+        roadmap = roadmap_with_courses(
+            [
+                CatalogRoadmapCourse(semester_number=2, course_code="CS206"),
+                CatalogRoadmapCourse(semester_number=3, course_code="CS350"),
+            ],
+        )
+        catalog_courses = {
+            "CS206": SimpleNamespace(course_code="CS206", prerequisites=[]),
+            "CS350": SimpleNamespace(
+                course_code="CS350",
+                prerequisites=["CS206"],
+            ),
+        }
+
+        with patch(
+            "fastapi_app.services.roadmaps.load_catalog_courses_by_code",
+            new=AsyncMock(return_value=catalog_courses),
+        ):
+            warnings = await roadmap_service.get_prerequisite_warnings(roadmap)
+
+        self.assertEqual(warnings, [])
 
 
 def integration_tests_enabled() -> bool:
