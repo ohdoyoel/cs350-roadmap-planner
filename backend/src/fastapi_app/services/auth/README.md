@@ -8,7 +8,8 @@
 
 - 회원가입 시 `@kaist.ac.kr` 이메일만 허용합니다.
 - 이메일은 앞뒤 공백을 제거하고 소문자로 정규화해서 저장합니다.
-- 이메일 인증 메일 발송이나 SSO 연동은 아직 구현하지 않았습니다.
+- 회원가입 시 이메일 인증 메일을 발송하고, 인증 전 사용자는 로그인할 수 없습니다.
+- 이메일 인증 링크는 백엔드의 `/auth/verify-email` 엔드포인트로 연결되며, 성공/실패 HTML을 반환합니다.
 - 로그인 성공 시 서버가 session token을 발급하고, 클라이언트는 이후 요청에 Bearer token으로 전달합니다.
 
 ```http
@@ -19,7 +20,13 @@ Authorization: Bearer <sessionToken>
 
 - `service.py`
   - `signup`, `login`, `logout` 같은 인증 use case를 구현합니다.
-  - 사용자 생성, 사용자 설정 생성, 비밀번호 검증, 세션 생성/종료 흐름을 조합합니다.
+  - 사용자 생성, 사용자 설정 생성, 이메일 인증 메일 발송, 비밀번호 검증, 세션 생성/종료 흐름을 조합합니다.
+  - 로그인 시 `email_verified = true`인 사용자에게만 세션을 발급합니다.
+
+- `email_verification.py`
+  - 이메일 인증 토큰 생성, 인증 링크 생성, Gmail SMTP 발송, 토큰 검증을 담당합니다.
+  - 원본 인증 토큰은 DB에 저장하지 않고 SHA-256 해시만 `email_verifications.token_hash`에 저장합니다.
+  - 인증에 성공하면 `users.email_verified`와 `users.email_verified_at`을 갱신하고, 사용한 토큰의 `used_at`을 채웁니다.
 
 - `sessions.py`
   - 세션 토큰의 생명주기를 담당합니다.
@@ -28,12 +35,63 @@ Authorization: Bearer <sessionToken>
 - `security.py`
   - 인증에 필요한 낮은 수준의 보안 helper를 담당합니다.
   - 랜덤 세션 토큰을 생성합니다.
+  - 랜덤 이메일 인증 토큰을 생성합니다.
   - DB에 저장하기 전에 세션 토큰을 해시합니다.
+  - DB에 저장하기 전에 이메일 인증 토큰을 해시합니다.
   - PBKDF2, salt, `PASSWORD_PEPPER`를 사용해 비밀번호를 해시하고 검증합니다.
   - 환경 변수에서 `SESSION_IDLE_TIMEOUT_MINUTES`와 `PASSWORD_PEPPER`를 읽습니다.
 
 - `__init__.py`
   - 라우터가 auth 패키지를 서비스 모듈처럼 import할 수 있도록 주요 인증 use case를 다시 export합니다.
+
+## 이메일 인증 방식
+
+회원가입 직후 사용자는 `email_verified = false` 상태입니다. 서버는 이메일 인증 토큰을 만들고,
+아래 형태의 링크를 KAIST 이메일로 발송합니다.
+
+```text
+http://localhost:8000/auth/verify-email?token=<raw-token>
+```
+
+인증 토큰 원문은 이메일 링크에만 포함됩니다. DB에는 SHA-256 해시값만 저장합니다.
+
+```text
+raw token -> SHA-256 -> email_verifications.token_hash
+```
+
+`GET /auth/verify-email`은 다음 조건을 확인합니다.
+
+- 토큰 해시와 일치하는 인증 document가 있는지
+- 이미 사용된 토큰이 아닌지
+- 만료되지 않았는지
+- 연결된 사용자가 존재하는지
+
+성공하면 다음 값을 갱신합니다.
+
+```text
+users.email_verified = true
+users.email_verified_at = now
+email_verifications.used_at = now
+```
+
+인증 링크는 브라우저에서 직접 여는 것을 전제로 하므로 JSON이 아니라 간단한 HTML 성공/실패 화면을 반환합니다.
+
+Gmail SMTP 발송에는 다음 환경 변수를 사용합니다.
+
+```env
+EMAIL_VERIFICATION_BASE_URL=http://localhost:8000
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USE_SSL=true
+SMTP_USE_TLS=false
+SMTP_TIMEOUT_SECONDS=30
+SMTP_USERNAME=your_gmail_address@gmail.com
+SMTP_PASSWORD=your_google_app_password
+SMTP_FROM_EMAIL=your_gmail_address@gmail.com
+```
+
+`SMTP_PASSWORD`는 Google 앱 비밀번호를 사용합니다. 앱 비밀번호를 공백 포함 형태로 복사해도,
+코드에서 공백을 제거한 뒤 Gmail SMTP에 로그인합니다.
 
 ## 비밀번호 저장 방식
 
@@ -75,7 +133,7 @@ pbkdf2_sha256$600000$4f8a91c0e2d3$9b1c0a7d...
 
 ## 세션 저장 방식
 
-로그인 또는 회원가입 성공 시 `sessions.start_session()`이 랜덤 session token을 생성합니다.
+로그인 성공 시 `sessions.start_session()`이 랜덤 session token을 생성합니다.
 
 서버는 원본 token을 DB에 저장하지 않고, SHA-256 해시값만 `auth_sessions.token_hash`에 저장합니다.
 클라이언트에는 원본 token을 한 번만 응답으로 내려줍니다.
@@ -145,8 +203,9 @@ ended_at = now
 
 ```text
 router
-  -> auth.service signup/login/logout
+  -> auth.service signup/login/logout/verify_email/resend_verification
     -> auth.security 비밀번호/토큰 helper
+    -> auth.email_verification 이메일 인증 토큰/메일 발송/검증
     -> auth.sessions 세션 저장/검증
     -> users/settings services 사용자 관련 데이터
 ```

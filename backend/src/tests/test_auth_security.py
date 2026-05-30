@@ -5,8 +5,11 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from fastapi_app.schemas.auth import LoginRequest, SignupRequest
+from fastapi_app.services.auth.email_verification import build_verification_url, ensure_utc
 from fastapi_app.services.auth.security import (
+    create_email_verification_token,
     create_session_token,
+    hash_email_verification_token,
     get_session_idle_timeout_minutes,
     hash_password,
     hash_session_token,
@@ -72,6 +75,30 @@ class SessionSecurityTest(unittest.TestCase):
         self.assertEqual(hashed, hash_session_token(token))
         self.assertNotEqual(hashed, token)
 
+    def test_email_verification_token_is_random_and_hashed(self) -> None:
+        first = create_email_verification_token()
+        second = create_email_verification_token()
+
+        self.assertNotEqual(first, second)
+        self.assertNotEqual(hash_email_verification_token(first), first)
+
+    def test_verification_url_defaults_to_localhost_backend(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            url = build_verification_url("raw-token")
+
+        self.assertEqual(
+            url,
+            "http://localhost:8000/auth/verify-email?token=raw-token",
+        )
+
+    def test_email_verification_datetime_normalizes_naive_utc(self) -> None:
+        naive = datetime(2026, 5, 30, 12, 0, 0)
+
+        normalized = ensure_utc(naive)
+
+        self.assertIsNotNone(normalized.tzinfo)
+        self.assertEqual(normalized.tzinfo, UTC)
+
     def test_idle_timeout_defaults_to_one_hour(self) -> None:
         with patch.dict(os.environ, {}, clear=True):
             self.assertEqual(get_session_idle_timeout_minutes(), 60)
@@ -111,6 +138,8 @@ class UserSerializationTest(unittest.TestCase):
         user = SimpleNamespace(
             id="507f1f77bcf86cd799439011",
             kaist_email="student@kaist.ac.kr",
+            email_verified=True,
+            email_verified_at=now,
             name="Student",
             created_at=now,
             updated_at=now,
@@ -119,6 +148,7 @@ class UserSerializationTest(unittest.TestCase):
         dumped = serialize_user(user).model_dump(by_alias=True)
 
         self.assertIn("kaistEmail", dumped)
+        self.assertIn("emailVerified", dumped)
         self.assertIn("createdAt", dumped)
         self.assertIn("updatedAt", dumped)
         self.assertNotIn("kaist_email", dumped)
@@ -128,6 +158,8 @@ class UserSerializationTest(unittest.TestCase):
         user = SimpleNamespace(
             id="507f1f77bcf86cd799439011",
             kaist_email="student@kaist.ac.kr",
+            email_verified=True,
+            email_verified_at=now,
             name="Student",
             created_at=now,
             updated_at=now,

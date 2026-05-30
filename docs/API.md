@@ -169,7 +169,7 @@ GET /courses?sector=인공지능/정보서비스&includePrerequisites=true
 
 | 항목 | 내용 |
 | --- | --- |
-| 목적 | KAIST 이메일 기반 사용자 생성 및 로그인 세션 발급 |
+| 목적 | KAIST 이메일 기반 사용자 생성 및 인증 메일 발송 |
 | 인증 | 불필요 |
 | Query Params | 없음 |
 
@@ -195,25 +195,56 @@ GET /courses?sector=인공지능/정보서비스&includePrerequisites=true
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
-| `sessionToken` | string | 이후 사용자 기반 API에서 사용할 Bearer session token |
-| `tokenType` | string | 항상 `bearer` |
-| `expiresAt` | string | 현재 세션 만료 시각 |
-| `user` | object | 로그인한 사용자 기본 정보 |
+| `kaistEmail` | string | 인증 메일을 보낸 KAIST 이메일 |
+| `emailSent` | boolean | 인증 메일 발송 여부 |
+| `message` | string | 처리 결과 메시지 |
 
 ```json
 {
-  "sessionToken": "QodAV4fbW3lIP0y0Kscqaw5lH1Z2g9Xx...",
-  "tokenType": "bearer",
-  "expiresAt": "2026-05-11T13:00:00Z",
-  "user": {
-    "id": "507f1f77bcf86cd799439011",
-    "name": "Student",
-    "kaistEmail": "student@kaist.ac.kr",
-    "createdAt": "2026-05-11T12:00:00Z",
-    "updatedAt": "2026-05-11T12:00:00Z"
-  }
+  "kaistEmail": "student@kaist.ac.kr",
+  "emailSent": true,
+  "message": "Verification email sent"
 }
 ```
+
+가입 직후 사용자는 `emailVerified=false` 상태입니다. 이메일의 인증 링크를 클릭해 인증을 완료한 뒤 `/auth/login`으로 세션을 발급받습니다.
+
+인증 메일 발송은 SMTP를 사용합니다. Gmail로 테스트할 때는 `.env`에 `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`, `SMTP_USE_SSL=true`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `EMAIL_VERIFICATION_BASE_URL=http://localhost:8000`을 설정합니다.
+
+## `GET /auth/verify-email`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 이메일 인증 링크 클릭 처리 |
+| 인증 | 불필요 |
+| Request Body | 없음 |
+
+### Query Params
+
+| 이름 | 타입 | 필수 | 설명 |
+| --- | --- | --- | --- |
+| `token` | string | 예 | 인증 메일에 포함된 원문 토큰 |
+
+성공하면 `emailVerified=true`로 변경하고 간단한 HTML 성공 화면을 반환합니다. 토큰이 없거나 만료/사용/위조된 경우 HTML 실패 화면을 반환합니다.
+
+## `POST /auth/resend-verification`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 미인증 사용자에게 인증 메일 재발송 |
+| 인증 | 불필요 |
+
+### Request Body
+
+```json
+{
+  "email": "student@kaist.ac.kr"
+}
+```
+
+### Response `200`
+
+`POST /auth/signup`과 같은 응답을 반환합니다.
 
 ### Error
 
@@ -297,6 +328,29 @@ Authorization: Bearer <sessionToken>
   }
 }
 ```
+
+### Error
+
+session token이 없거나 유효하지 않으면 `401`을 반환합니다.
+
+## `DELETE /me`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 현재 로그인한 사용자 계정 탈퇴 |
+| 인증 | 필요 |
+| Query Params | 없음 |
+| Request Body | 없음 |
+
+### Headers
+
+```http
+Authorization: Bearer <sessionToken>
+```
+
+### Response `204`
+
+응답 본문 없이 현재 사용자 계정을 삭제합니다. 관련 `settings`, `roadmap`, `auth_sessions`, `email_verifications`도 함께 삭제합니다.
 
 ### Error
 

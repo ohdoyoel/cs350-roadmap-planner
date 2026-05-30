@@ -8,6 +8,8 @@ class User(Document):
     name: str | None = None
     kaist_email: str = Field(min_length=3)
     password_hash: str | None = None
+    email_verified: bool = False
+    email_verified_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 

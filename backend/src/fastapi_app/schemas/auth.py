@@ -63,6 +63,32 @@ class SignupRequest(BaseModel):
         return value
 
 
+class SignupResponse(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    kaist_email: str = Field(serialization_alias="kaistEmail")
+    email_sent: bool = Field(serialization_alias="emailSent")
+    message: str
+
+
+class ResendVerificationRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    email: str
+
+    @field_validator("email")
+    @classmethod
+    def validate_kaist_email(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        if not normalized.endswith("@kaist.ac.kr"):
+            raise ValueError("KAIST email is required")
+        return normalized
+
+
+class VerifyEmailResponse(BaseModel):
+    message: str
+
+
 class SessionResponse(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
