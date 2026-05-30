@@ -112,6 +112,7 @@ MongoDB 연결에 실패하면 `200` 응답을 반환하지 않습니다.
 | `[].courseCode` | string | 과목코드 |
 | `[].courseName` | string | 한글 과목명 |
 | `[].courseNameEn` | string \| null | 영문 과목명 |
+| `[].description` | string \| null | 과목 설명 |
 | `[].category` | string | 이수구분. 예: `전공필수` |
 | `[].sectors` | string[] | 세부 분야 목록 |
 | `[].offeredSemesters` | string[] | 개설 학기 목록. `S`, `F` |
@@ -132,6 +133,7 @@ MongoDB 연결에 실패하면 `200` 응답을 반환하지 않습니다.
     "courseCode": "CS300",
     "courseName": "알고리즘 개론",
     "courseNameEn": "Introduction to Algorithms",
+    "description": null,
     "category": "전공필수",
     "sectors": ["전산이론"],
     "offeredSemesters": ["S", "F"],
@@ -402,6 +404,7 @@ session token이 없거나 유효하지 않으면 `401`을 반환합니다.
 | `courseCode` | string | 과목코드 |
 | `courseName` | string | 한글 과목명 |
 | `courseNameEn` | string \| null | 영문 과목명 |
+| `description` | string \| null | 과목 설명 |
 | `category` | string | 이수구분 |
 | `sectors` | string[] | 세부 분야 목록 |
 | `offeredSemesters` | string[] | 개설 학기 목록 |
@@ -417,6 +420,7 @@ session token이 없거나 유효하지 않으면 `401`을 반환합니다.
   "courseCode": "CS300",
   "courseName": "알고리즘 개론",
   "courseNameEn": "Introduction to Algorithms",
+  "description": null,
   "category": "전공필수",
   "sectors": ["전산이론"],
   "offeredSemesters": ["S", "F"],

@@ -27,6 +27,7 @@ def course(
         course_code=course_code,
         course_name=course_name,
         course_name_en=course_name_en,
+        description=None,
         category=category,
         sectors=sectors or [],
         offered_semesters=offered_semesters or [],
@@ -115,6 +116,7 @@ class CourseServiceTest(unittest.TestCase):
             course_code="CS300",
             course_name="알고리즘 개론",
             course_name_en="Introduction to Algorithms",
+            description="Course description",
             category="전공필수",
             sectors=["전산이론"],
             offered_semesters=["S", "F"],
@@ -134,6 +136,8 @@ class CourseServiceTest(unittest.TestCase):
         self.assertIn("courseCode", dumped)
         self.assertIn("courseName", dumped)
         self.assertIn("courseNameEn", dumped)
+        self.assertIn("description", dumped)
+        self.assertEqual(dumped["description"], "Course description")
         self.assertIn("offeredSemesters", dumped)
         self.assertIn("isKeyCourse", dumped)
         self.assertNotIn("course_code", dumped)

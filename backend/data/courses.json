@@ -19,6 +19,7 @@
       "raw": "2:3:3(0)"
     },
     "prerequisites": [],
+    "description": "The course teaches the basic technique of computer programming and the basic knowledge in the computer structure, and use of the elective programming language to resolve given problems in structural programming. Based on the elective programming language, it teaches the data structure, input and output, flow control and incidental program, and by using the systematic division of problem solution and concept of module to solve the problems in numerical value field and non-numerical value field with the program experiment.",
     "is_key_course": false
   },
   {
@@ -41,11 +42,13 @@
       "raw": "2:3:3(0)"
     },
     "prerequisites": [],
+    "description": "In this course students who have taken CS101 but who have otherwise little programming experience can develop their programming skills. The course introduces basic concepts of programming and computer science, such as dynamic and static typing, dynamic memory allocation, objects and methods, binary representation of numbers, using an editor and compiler from the command line, running programs with arguments from the commmand line, graphical user interfaces and event-based programming, using libraries, and the use of basic data structures such as arrays, lists, stacks, sets, and maps.",
     "is_key_course": false
   },
   {
     "course_code": "MAS110",
     "course_name": "데이터과학을 위한 선형대수학",
+    "course_name_en": "Linear Algebra for Data Science",
     "category": "기초선택",
     "sectors": [],
     "offered_semesters": [
@@ -60,11 +63,13 @@
       "raw": "3:1:3(0)"
     },
     "prerequisites": [],
+    "description": "This course provides a comprehensive introduction to linear algebra with a focus on applications in data science. Topics include vectors, matrices, systems of linear equations, eigenvalues, and eigenvectors.",
     "is_key_course": false
   },
   {
     "course_code": "MAS109",
     "course_name": "선형대수학개론",
+    "course_name_en": "Introduction to Linear Algebra",
     "category": "기초선택",
     "sectors": [],
     "offered_semesters": [
@@ -79,6 +84,7 @@
       "raw": "3:1:3(0)"
     },
     "prerequisites": [],
+    "description": "This course provides a comprehensive introduction to linear algebra with a focus on applications in data science. Topics include vectors, matrices, systems of linear equations, eigenvalues, and eigenvectors.",
     "is_key_course": false
   },
   {
@@ -103,6 +109,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course covers mathematical concepts that are frequently employed in computer science: sets, relations, propositional logic, predicative logic, graphs, trees, recurrences, recursion, and fundamental notions in abstract algebra such as groups and rings.",
     "is_key_course": false
   },
   {
@@ -126,6 +133,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course provides students with fundamental concepts in data structures and algorithms in a broad context of solving problems using computers.",
     "is_key_course": false
   },
   {
@@ -151,6 +159,7 @@
       "CS204",
       "CS206"
     ],
+    "description": "This course introduces the basic concepts of design and analysis of computer algorithms: the basic principles and techniques of computational complexity (worst-case and average behavior, space usage, and lower bounds on the complexity of a problem), and algorithms for fundamental problems. It also introduces the areas of NP-completeness and parallel algorithms.",
     "is_key_course": false
   },
   {
@@ -176,6 +185,7 @@
       "CS211",
       "CS230"
     ],
+    "description": "This course provides students with a basic understanding of computer organization and architecture. It is concerned mostly with the hardware aspects of computer systems: structural organization and hardware design of digital computer systems, underlying design principles and their impact on computer performance, and software impact on computer.",
     "is_key_course": false
   },
   {
@@ -201,6 +211,7 @@
       "CS204",
       "CS230"
     ],
+    "description": "This course provides students with the necessary underlying principles in the design and implementation of programming languages. Lectures use a variety of existing general-purpose programming languages from different programming paradigms: imperative, functional, logical, and object-oriented programming.",
     "is_key_course": true
   },
   {
@@ -226,6 +237,7 @@
     "prerequisites": [
       "CS230"
     ],
+    "description": "In this course, students learn about basic concepts of operating systems, with an emphasis on multi-tasking, and time-sharing. We choose one specific operating system, and study in detail its organization and functions. Students are also required to program a simple operating system, and to develop performance improvement techniques.",
     "is_key_course": true
   },
   {
@@ -249,6 +261,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course's goal is to provide students with programming techniques necessary in dealing with systems development. The covered topics include low-level machine oriented programming, device-control programming, and other various programming techniques for computer operating environment.",
     "is_key_course": true
   },
   {
@@ -274,6 +287,7 @@
     "prerequisites": [
       "CS230"
     ],
+    "description": "The goal of this course is to provide students with sound understanding of fundamental concepts and problems in networking and to train them in network programming. We begin with an introduction to key applications in today's Internet and then cover the reliable transfer protocol, TCP, and its congestion control; and the IP layer that covers the diversity in physical layer technologies and provides an end-to-end abstraction. Finally, we include key concepts in multimedia networking and security in communication networks.",
     "is_key_course": true
   },
   {
@@ -297,6 +311,7 @@
     "prerequisites": [
       "CS206"
     ],
+    "description": "Data science is an inter-disciplinary field focused on extracting knowledge from typically large data sets. This course aims at teaching basic skills in data science for undergraduate students. It covers basic probability and statistics theories required for data science; exploratory data analysis (EDA) required for understanding a given data set; and predictive analysis based on statistical or machine learning techniques. Additionally, it discusses recent big data processing techniques and various data science applications. The students will learn how to implement the methodologies using the Python language.",
     "is_key_course": false
   },
   {
@@ -322,6 +337,7 @@
     "prerequisites": [
       "CS206"
     ],
+    "description": "This is an introductory-level course to database systems. Students learn about various models, such as E-R models, relational models, and object-oriented models; query languages such as SQL, relational calculus, and QBE; and file and indexing systems for data storage. Advanced topics, such as data inheritance, database design issues using functional and multivalued dependencies, database security, and access rights, are also covered.",
     "is_key_course": false
   },
   {
@@ -344,6 +360,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course provides students with basic concepts in software engineering in order to develop high-quality software economically. Key concepts are life cycle models, development techniques, automation tools, project management skills, and software metrics.",
     "is_key_course": false
   },
   {
@@ -367,6 +384,7 @@
     "prerequisites": [
       "CS350"
     ],
+    "description": "This class covers basics of automated software testing techniques with regard to practical applications. These automated testing techniques can provide high reliability for complex embedded software compared to traditional testing methods in a more productive way. This class utilizes various automated software testing tools and learn about their underlying mechanisms for maximal benefit.",
     "is_key_course": false
   },
   {
@@ -390,6 +408,7 @@
     "prerequisites": [
       "CS350"
     ],
+    "description": "This course aims to introduce the operations and applications of metaheuristic and bio-inspired algorithms, including genetic algorithm, swarm optimization, and artificial immune system. By considering diverse problems ranging from combinatorial ones to performance improvement of complex software system, students are expected to learn how to apply computational intelligence to unseen problems.",
     "is_key_course": false
   },
   {
@@ -413,6 +432,7 @@
     "prerequisites": [
       "CS350"
     ],
+    "description": "This course is designed to learn requirements engineering concepts and techniques for developing software systems in modern smart computing environments such as the World Wide Web, Internet of Things (IoT), and mobile computing environments. In this course, students learn the core concepts and techniques of software requirements engineering, the key characteristics of the Web, IoT and mobile computing environments, and practical methods to elicit, model, analyze and manage requirements for developing software systems in the modern computing environments.",
     "is_key_course": false
   },
   {
@@ -434,6 +454,7 @@
       "raw": "3:4:4(0)"
     },
     "prerequisites": [],
+    "description": "This course provides students with an understanding of digital systems as building blocks of modern digital computers. This course puts emphasis on providing students with hands-on experience on digital systems. The course includes both lecture and laboratory work on the topics of: boolean algebra, binary system, combinatorial logic, asynchronous sequential circuits, algorithmic state machine, asynchronous sequential circuits, VHDL, CAD tools and FPGAs.",
     "is_key_course": false
   },
   {
@@ -457,6 +478,7 @@
     "prerequisites": [
       "CS211"
     ],
+    "description": "Embedded systems are found everywhere. The goal of this course is to develop a comprehensive understanding of the technologies behind the embedded computer systems, including hardware and software components. Students will gain hands-on experience in designing a embedded system using CAD tools and FPGAs.",
     "is_key_course": false
   },
   {
@@ -481,6 +503,7 @@
     "prerequisites": [
       "CS300"
     ],
+    "description": "This course deals with models of computation, computable and incomputable functions, temporal and spatial complexities, tractable and intractable functions.",
     "is_key_course": false
   },
   {
@@ -503,6 +526,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "The goal of this course is to provide students with theoretical basis of distributed system design and hands-on experience with distributed systems. The course will start with introduction to functional programming, and then proceed to the MapReduce-like cloud computing framework. Then we expose students to distributed algorithms. Students learn how to program massively parallel jobs in a cloud computing environment and build theoretical underpinnings to expand MapReduce experience to a greater diversity of cloud computing applications.",
     "is_key_course": false
   },
   {
@@ -526,6 +550,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "Machine learning, a sub-field of computer science, has been popular with the era of intelligent softwares and attracted huge attentions from computer vision, natural language processing, healthcare and finance communities to name a few. In this introductory course, we will cover various basic topics in the area including some recent supervised and unsupervised learning algorithms.",
     "is_key_course": false
   },
   {
@@ -549,6 +574,7 @@
       "raw": "3:2:3(0)"
     },
     "prerequisites": [],
+    "description": "With advances in computing environment, we can get high quality rendering of 3D virtual world in realtime. This course is designed for understanding practical algorithms for realizing 3D computer graphics and visualization essential for not only computer animation but also in various interactive applications including computer games, simulation, and virtual reality. This is a projects-oriented class that will introduce the concepts of interactive computer graphics. Students are expected to work on a team to develop their own project.",
     "is_key_course": false
   },
   {
@@ -570,6 +596,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "The course studies concepts, theories and state-of-the-art methods for visual learning and recognition. This module is unique focusing on a broader set of machine learning, for computer vision, in an optimisation perspective. ",
     "is_key_course": false
   },
   {
@@ -592,6 +619,7 @@
       "raw": "3:3:4(0)"
     },
     "prerequisites": [],
+    "description": "The goal of this course is for students to acquire theory and hands-on experience in computer graphics. Topics covered are: basic functions and principles of input and output devices used in computer graphics, architectures and features of graphics systems, basic geometric models and their generation algorithms, theories and practice behind 2D and 3D conversion. Basic ideas of hidden line and surface removal and color models are introduced.",
     "is_key_course": false
   },
   {
@@ -617,6 +645,7 @@
       "CS470",
       "CS474"
     ],
+    "description": "In this course, students will learn the basic principles and techniques of image processing. Expanding the foundations of image processing, they will learn 3-dimensional image processing from camera images and also techniques for deep learning-based image understanding, combined with artificial intelligence. To this end, the curriculum of this course consists of three parts: (1) the basic principles and understanding of image processing, (2) the basic principles and understanding of 3D image processing, and (3) the basic principles and understanding of image processing using artificial intelligence. Students learn and experience basic principles for computer vision and various image processing applications based on the deep understanding of computer vision.",
     "is_key_course": false
   },
   {
@@ -642,6 +671,7 @@
       "CS300",
       "CS320"
     ],
+    "description": "This course is about basics of logic used in computer programming. Topics covered in this course are: propositional calculus, predicate calculus, axiomatic theories, skolemization, unification, and resolution.",
     "is_key_course": false
   },
   {
@@ -664,6 +694,7 @@
       "raw": "2:3:3(0)"
     },
     "prerequisites": [],
+    "description": "This course is about methods for problem solving and algorithm development. Through various lab work, students learn good programming practice in design, coding, debugging, and documentation.",
     "is_key_course": false
   },
   {
@@ -685,6 +716,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course covers various types of finite automata, properties of language classes recognizable by automata, context-free grammar, pushdown automata, the Turing machine, and computability.",
     "is_key_course": false
   },
   {
@@ -707,6 +739,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course teaches concurrent programming techniques for efficiently controlling parallel resources in order to maximize performance, and verification techniques for such programs. In old days, sequential processing was default while parallel processing was exceptional; nowadays, the other way around. Such tendancy is accelerated by the advent of big data processing. This course aims to help students acculumate a grounding in efficient control of parallel resources with theory and programming practices.",
     "is_key_course": false
   },
   {
@@ -728,6 +761,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This class teaches automated SW testing techniques that analyze target source code to automatically generate various test inputs which explore diverse behaviors of a target program. This class guides students to use various open-source software testing tools and learn the underlying mechanisms of the tools to maximize the performance of automated testing.",
     "is_key_course": false
   },
   {
@@ -749,6 +783,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "Data visualization techniques help data scientists to interact with data to extract insightful information, examine hypotheses, and perform data storytelling for decision making. This course covers the fundamental concepts of data visualization, such as design principles, representation, perception, color, and data storytelling. Besides, it will provide in-depth tutorials and practices on the entire visualization process (i.e., ideation, prototyping, and usability testing) by building a web-based interactive service with Python and JavaScript. The course will be delivered in an active learning format such that concept learning is followed by in-class activities and programming practices. Furthermore, there will be programming sessions (e.g., Web programming, Python data processing, and visualization) and design studio sessions (e.g., design process and peer feedback). A final project on building real-world visual analytics solutions will help students to use the techniques learned in the class (e.g., exploring a mobile and wearable sensor dataset on the web).",
     "is_key_course": false
   },
   {
@@ -772,6 +807,7 @@
     "prerequisites": [
       "CS330"
     ],
+    "description": "This course is designed to learn technologies and strategies for modeling and building service oriented architecture and service applications in various computing environments such as Internet of Things, mobile computing and cloud computing environments to integrate various computing resources and capabilities in users’ point of views.",
     "is_key_course": false
   },
   {
@@ -794,6 +830,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course's goal is to provide students with programming principles and a good feel for the elements of style and the aesthetics of programming, which are necessary in controlling the intellectual complexity of large yet robust software systems. The covered topics include: induction and recursion, data abstraction and representation, values and applicative programming, objects and imperative programming, streams and demand-driven programming, modularity and hierarchy, exceptions and advanced control, and higher-order functions and continuations.",
     "is_key_course": false
   },
   {
@@ -815,6 +852,7 @@
       "raw": "2:3:3(0)"
     },
     "prerequisites": [],
+    "description": "Students learn LISP and PROLOG, the two most commonly used programming languages in artificial intelligence. The basic programming concepts, grammar, and symbol manipulation are covered in the course. Using intelligent problem solving methods, students build natural language processing systems, database programs, pattern matching programs, learning programs, expert systems, etc.",
     "is_key_course": false
   },
   {
@@ -836,6 +874,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course will introduce students to the basics of embodied intelligence called intelligent robotics. The course aims to study the fundamental concepts in intelligent robotic system that can sense, plan, and act in the world. To do that, we will discuss 1) the basic concepts, such as control, kinematics, in traditional robotics and 2) state-of-the-art technologies, such as task-and-motion planning and machine learning theories, toward intelligent robotic system. The course will include a brief review of basic tools, such as Robot Operating System (ROS), and also overview contemporary techniques. It will also include individual exercise and final (individual/team) projects.",
     "is_key_course": false
   },
   {
@@ -859,6 +898,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "3D Data are widely used in many applications in computer vision, computer graphics, and robotic. In this course, we will cover the recent advances in machine learning techniques for processing and analyzing 3D data and discuss the remaining challenges. Most of the course material will be less-than 5-year-old research papers in several sub-fields including Computer Vision, Computer Graphics, and Machine Learning. The course will be project-oriented (no exam, no paper-and-pencil homework, but easy programming assignments) and consist of seminar-style reading group presentations.",
     "is_key_course": false
   },
   {
@@ -883,6 +923,7 @@
       "CS372",
       "CS376"
     ],
+    "description": "This course will cover important problems and concepts in natural language processing and the machine learning models used in those problems. Students will learn the theory and practice of ML methods for NLP, read and conduct research based on latest research publications.",
     "is_key_course": false
   },
   {
@@ -906,6 +947,7 @@
     "prerequisites": [
       "CS300"
     ],
+    "description": "Through this course, students study basic rules and implementation considerations in implementing a programming language. More details on grammar checks for program syntax, implementation optimization, relations between programming languages and compilers, the role of interpreters, run-time systems, and semantically accurate expressions are also covered.",
     "is_key_course": false
   },
   {
@@ -927,6 +969,7 @@
       "raw": "2:3:3(0)"
     },
     "prerequisites": [],
+    "description": "The course introduces web attacks that trigger various vulnerabilities in web services. It covers SQL injection, cross-site scripting, and cross-site request forgery, which constitute core web attacks, as well as same-origin policy. The course also provides a lab session for each week, which helps students practice actual attacks in a simulated web environment. The goal of the course is to let students learn and understand various web threats via conducting the covered attacks by themselves.",
     "is_key_course": false
   },
   {
@@ -951,6 +994,7 @@
       "CS220",
       "CS230"
     ],
+    "description": "This course covers the overall contents of information security. Students will be exposed to fundamental concepts in information security including cryptography, system security, software security, web security and network security. This course introduces how security attacks occur in the modern computing environments. Students will also have opportunities to understand techniques to discover and disable such security attacks.",
     "is_key_course": false
   },
   {
@@ -973,6 +1017,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "We cover fundamental concepts and problems in mobile and wireless networking and teach system design and implementation in mobile computing. Topics we cover are: introduction to data communications, CDMA, WiFi, and WiBro/WiMAX. Issues related to mobile computing platforms as well as systems comprising sensor networks are also covered. The term project involves application design and development for mobile computing.",
     "is_key_course": false
   },
   {
@@ -996,6 +1041,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This course introduces fundamental concepts, theories, and methods for designing, prototyping, implementing, and evaluating user interfaces. Students apply these lessons to a practical problem in a team project, which follows a user-centered design process.",
     "is_key_course": false
   },
   {
@@ -1020,6 +1066,7 @@
     "prerequisites": [
       "CS374"
     ],
+    "description": "Computing today no longer only concerns a single user in front of their computer. An increasing number of modern systems are inherently social, involving a large group of users to collaborate, discuss, ideate, solve problems, and make decisions together via social interaction. This course aims to introduce major concepts, real-world examples, design issues, and computational techniques in social computing. Students apply the lessons to a practical problem via a semester-long team project.",
     "is_key_course": false
   },
   {
@@ -1043,6 +1090,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "The course offers students a practical introduction to natural language processing with the Python programming language, helping the students to learn by example, write real programs, and grasp the value of being able to test an idea through implementation, with an extensive collection of linguistic algorithms and data structures in robust language processing software.",
     "is_key_course": false
   },
   {
@@ -1068,6 +1116,7 @@
       "CS372",
       "CS376"
     ],
+    "description": "This course introduces basic concepts and design techniques of artificial intelligence, and later deals with knowledge representation and inference techniques. Students are to design, implement, and train knowledge-based systems.",
     "is_key_course": false
   },
   {
@@ -1089,6 +1138,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "Computers have had a significant impact on our life, more so than any other machine before. In this course, we discuss social problems that computers have caused and ethical issues that challenge technical experts.",
     "is_key_course": false
   },
   {
@@ -1111,6 +1161,7 @@
       "raw": "2:3:3(0)"
     },
     "prerequisites": [],
+    "description": "This course aims to provide an opportunity for sophomores to experience creative system design using Lego mindstorm NXT kit and URBI robot software platform. In lectures, robotic CS is introduced and various examples are demonstrated to bring out students' interests. In lab hours, students build own intelligent robot system creatively. Students are educated to integrate hardware and software designs, and make presentations at the end of semester.",
     "is_key_course": false
   },
   {
@@ -1133,6 +1184,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "Tremendous success of Artificial Intelligence (AI) can be attributed to two primary reasons: (1) significant advances in ML algorithms with great emphasis on Deep Learning, and (2) high-performance computing mainly fueled by hardware accelerators such as GPU and specialized software systems. This course focuses on the second reason and look at AI in the system perspective. This course will look into the entire computing stack built solely for AI, particularly Machine Learning and Deep Learning, This stack constitutes domain-specific programming interface and platforms (e.g., Tensorflow), DNN compilers (e.g., TVM), and hardware accelerators (e.g., GPU and TPU). ",
     "is_key_course": false
   },
   {
@@ -1158,6 +1210,7 @@
       "CS320",
       "CS376"
     ],
+    "description": "The course aims at teaching students techniques from machine learning and programming languages that enable the design and implementation of a programming language for easily writing advanced probabilistic models from machine learning. We will cover a wide range of general-purpose algorithms for probabilistic inference, and discuss how these algorithms can be used to build programming languages and systems for developing models from machine learning. We will also study a mathematical foundation of those languages using tools from measure-theoretic probability theory.",
     "is_key_course": false
   },
   {
@@ -1179,6 +1232,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "This is an undergraduate-level introductory course for deep learning. There have been enormous advances in the field of artificial intelligence over the past few decades, especially based on deep learning. However, it is not easy to see what frontiers the current deep learning is facing and what underlying methods are used to enable these advances. This course aims to provide an overview of traditional/emerging topics and applications in deep learning, and basic skill sets to understand/implement some of the latest algorithms. ",
     "is_key_course": false
   },
   {
@@ -1203,6 +1257,7 @@
       "CS372",
       "CS376"
     ],
+    "description": "This course will introduce the essential techniques of text mining, understand as the process of deriving high-quality information from unstructured text. The techniques include: the process of analyzing and structuring the input text with natural language processing, deriving patterns with machine learning, and evaluating and interpreting the output. The course will cover some typical text mining tasks such as text categorization, text clustering, document summarization, and relation discovery between entities.",
     "is_key_course": false
   },
   {
@@ -1224,6 +1279,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "Graphs are fundamental tools for modeling relationships between objects, enabling us to model diverse real-world problems and data. Graph machine learning and graph mining techniques are utilized in many modern AI and big data analytics domains. This course introduces various graph-based machine learning and mining techniques, including graph neural networks (applying deep learning ideas to graphs), knowledge graphs (representing human knowledge as graphs), graph representation learning (converting graphs into feature vectors), random walks and centrality measures on graphs, graph clustering, and graph anomaly detection. Also, this course introduces how these techniques are applied in information retrieval, natural language understanding, computer vision & graphics, robotics, and bioinformatics.",
     "is_key_course": false
   },
   {
@@ -1245,6 +1301,7 @@
       "raw": "3:0:3(0)"
     },
     "prerequisites": [],
+    "description": "As computer forms and utilization environments become diverse, various user interfaces are evolving beyond the traditional GUI. Especially with the advancement of AR/VR platforms, the importance of wearable user interfaces is increasing. This course aims to understand various genres of wearable user interfaces, major prototyping techniques for researching them, and multi-modal channels for proposing new wearable interfaces.",
     "is_key_course": false
   }
 ]

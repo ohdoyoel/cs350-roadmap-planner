@@ -24,6 +24,7 @@ def serialize_course(course: Course, matched: bool = True) -> CourseDTO:
         course_code=course.course_code,
         course_name=course.course_name,
         course_name_en=course.course_name_en,
+        description=course.description,
         category=course.category,
         sectors=course.sectors,
         offered_semesters=course.offered_semesters,
