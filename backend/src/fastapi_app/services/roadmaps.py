@@ -106,10 +106,10 @@ def ensure_course_slot_available(
         )
         if same_original:
             continue
-        if course.semester_number == semester_number and course.course_code == course_code:
+        if course.course_code == course_code:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Course already exists in this semester",
+                detail="Course already exists in this roadmap",
             )
 
 

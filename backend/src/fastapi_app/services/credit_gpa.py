@@ -74,8 +74,6 @@ def get_course_status(
     current_semester_number: int,
     grade: RoadmapCourseGrade,
 ) -> CourseStatus:
-    if grade == "R":
-        return "excluded"
     if semester_number == current_semester_number:
         return "in_progress"
     if semester_number > current_semester_number:

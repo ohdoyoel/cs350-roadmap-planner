@@ -18,7 +18,6 @@ CourseStatus = Literal[
     "in_progress",
     "planned",
     "missing_grade",
-    "excluded",
 ]
 
 

@@ -132,14 +132,14 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(roadmap.courses[0].semester_number, 3)
         self.assertEqual(result.courses[0].course_code, "CS350")
 
-    async def test_add_course_rejects_duplicate_in_same_semester(self) -> None:
+    async def test_add_course_rejects_duplicate_course_in_roadmap(self) -> None:
         roadmap = roadmap_with_courses(
             [CatalogRoadmapCourse(semester_number=3, course_code="CS350")],
         )
         course = TypeAdapter(RoadmapCourseDTO).validate_python(
             {
                 "type": "catalog",
-                "semester": "2-1",
+                "semester": "3-1",
                 "courseCode": "CS350",
             },
         )
@@ -199,7 +199,7 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
         roadmap = roadmap_with_courses(
             [
                 CatalogRoadmapCourse(semester_number=3, course_code="CS350"),
-                CatalogRoadmapCourse(semester_number=5, course_code="CS350"),
+                CatalogRoadmapCourse(semester_number=5, course_code="CS101"),
             ],
         )
 
@@ -211,8 +211,8 @@ class RoadmapServiceTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(roadmap.save_count, 1)
         self.assertEqual(len(roadmap.courses), 1)
-        self.assertEqual(roadmap.courses[0].semester_number, 5)
-        self.assertEqual(result.courses[0].model_dump(by_alias=True)["semester"], "3-1")
+        self.assertEqual(roadmap.courses[0].course_code, "CS101")
+        self.assertEqual(result.courses[0].course_code, "CS101")
 
 
 def integration_tests_enabled() -> bool:
@@ -336,7 +336,7 @@ class RoadmapApiIntegrationTest(unittest.TestCase):
 
         self.assertEqual(duplicate_response.status_code, 409)
 
-        retake_response = self.client.post(
+        duplicate_other_semester_response = self.client.post(
             "/roadmap/me/courses",
             json={
                 "type": "catalog",
@@ -346,8 +346,7 @@ class RoadmapApiIntegrationTest(unittest.TestCase):
             headers=self.headers,
         )
 
-        self.assertEqual(retake_response.status_code, 200)
-        self.assertEqual(len(retake_response.json()["courses"]), 2)
+        self.assertEqual(duplicate_other_semester_response.status_code, 409)
 
         move_response = self.client.post(
             "/roadmap/me/courses/move",
@@ -375,22 +374,12 @@ class RoadmapApiIntegrationTest(unittest.TestCase):
         self.assertEqual(grade_response.json()["courses"][0]["grade"], "A0")
 
         delete_response = self.client.delete(
-            "/roadmap/me/courses/3-1/CS350",
+            "/roadmap/me/courses/2-2/CS350",
             headers=self.headers,
         )
 
         self.assertEqual(delete_response.status_code, 200)
-        self.assertEqual(
-            delete_response.json()["courses"],
-            [
-                {
-                    "type": "catalog",
-                    "semester": "2-2",
-                    "courseCode": "CS350",
-                    "grade": "A0",
-                },
-            ],
-        )
+        self.assertEqual(delete_response.json()["courses"], [])
 
     def test_roadmap_rejects_unknown_catalog_course(self) -> None:
         response = self.client.post(

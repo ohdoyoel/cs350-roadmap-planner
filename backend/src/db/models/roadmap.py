@@ -24,7 +24,6 @@ RoadmapCourseGrade = Literal[
     "F",
     "S",
     "U",
-    "R",
 ]
 
 
