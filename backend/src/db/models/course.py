@@ -40,6 +40,7 @@ class Course(Document):
     course_code: str = Field(min_length=2)
     course_name: str = Field(min_length=1)
     course_name_en: str | None = None
+    description: str | None = None
     category: CourseCategoryName
     sectors: list[CourseSectorName] = Field(default_factory=list)
     offered_semesters: list[OfferedSemester] = Field(default_factory=list)
