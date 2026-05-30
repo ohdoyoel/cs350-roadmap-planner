@@ -14,9 +14,9 @@
     "credit": {
       "lecture": 2,
       "lab": 3,
-      "credit": 2,
+      "credit": 3,
       "au": 0,
-      "raw": "2:3:2(0)"
+      "raw": "2:3:3(0)"
     },
     "prerequisites": [],
     "is_key_course": false
