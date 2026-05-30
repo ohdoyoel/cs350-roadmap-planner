@@ -335,6 +335,46 @@ Authorization: Bearer <sessionToken>
 
 session token이 없거나 유효하지 않으면 `401`을 반환합니다.
 
+## `PATCH /me/academic-option`
+
+| 항목 | 내용 |
+| --- | --- |
+| 목적 | 현재 사용자의 전공 구분 수정 |
+| 인증 | 필요 |
+| Query Params | 없음 |
+| Request Body | 변경할 `academicOption` |
+
+### Headers
+
+```http
+Authorization: Bearer <sessionToken>
+```
+
+### Request Body
+
+```json
+{
+  "academicOption": "double_major"
+}
+```
+
+`academicOption`은 `major`, `minor`, `double_major` 중 하나이며, 이 endpoint에서 변경할 수 있는 유일한 값입니다.
+
+### Response `200`
+
+수정 후 `SettingsDTO`를 반환합니다.
+
+```json
+{
+  "id": "607f1f77bcf86cd799439011",
+  "userId": "507f1f77bcf86cd799439011",
+  "language": "ko",
+  "theme": "system",
+  "academicOption": "double_major",
+  "graduationYear": 2027
+}
+```
+
 ## `DELETE /me`
 
 | 항목 | 내용 |
@@ -758,6 +798,7 @@ Credit and GPA API는 roadmap을 기반으로 현재 학기 기준 학점, GPA, 
 ```json
 {
   "currentSemester": "2-1",
+  "academicOption": "major",
   "credits": {
     "completed": 33,
     "inProgress": 15,

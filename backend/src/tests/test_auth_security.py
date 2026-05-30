@@ -2,9 +2,10 @@ import os
 import unittest
 from datetime import UTC, datetime
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from fastapi_app.schemas.auth import LoginRequest, SignupRequest
+from fastapi_app.schemas.users import AcademicOptionUpdateRequest
 from fastapi_app.services.auth.email_verification import build_verification_url, ensure_utc
 from fastapi_app.services.auth.security import (
     create_email_verification_token,
@@ -15,7 +16,7 @@ from fastapi_app.services.auth.security import (
     hash_session_token,
     verify_password,
 )
-from fastapi_app.services.settings import serialize_settings
+from fastapi_app.services.settings import serialize_settings, update_user_academic_option
 from fastapi_app.services.users import serialize_user, serialize_user_with_settings
 
 
@@ -35,6 +36,13 @@ class LoginSchemaTest(unittest.TestCase):
     def test_login_rejects_short_password(self) -> None:
         with self.assertRaises(ValueError):
             LoginRequest(email="student@kaist.ac.kr", password="short")
+
+
+class FakeSettings(SimpleNamespace):
+    save_count: int = 0
+
+    async def save(self) -> None:
+        self.save_count += 1
 
 
 class SignupSchemaTest(unittest.TestCase):
@@ -132,7 +140,7 @@ class PasswordSecurityTest(unittest.TestCase):
             self.assertFalse(verify_password("secure-password", stored_hash))
 
 
-class UserSerializationTest(unittest.TestCase):
+class UserSerializationTest(unittest.IsolatedAsyncioTestCase):
     def test_user_dto_serializes_camel_case(self) -> None:
         now = datetime.now(UTC)
         user = SimpleNamespace(
@@ -195,6 +203,34 @@ class UserSerializationTest(unittest.TestCase):
         self.assertIn("userId", dumped)
         self.assertIn("academicOption", dumped)
         self.assertIn("graduationYear", dumped)
+
+    def test_academic_option_update_request_accepts_alias(self) -> None:
+        payload = AcademicOptionUpdateRequest.model_validate(
+            {"academicOption": "double_major"},
+        )
+
+        self.assertEqual(payload.academic_option, "double_major")
+
+    async def test_update_user_academic_option_changes_only_academic_option(self) -> None:
+        settings = FakeSettings(
+            id="607f1f77bcf86cd799439011",
+            user_id="507f1f77bcf86cd799439011",
+            theme="system",
+            language="ko",
+            academic_option="major",
+            graduation_year=2027,
+        )
+        payload = AcademicOptionUpdateRequest(academic_option="minor")
+
+        with patch(
+            "fastapi_app.services.settings.get_user_settings",
+            new=AsyncMock(return_value=settings),
+        ):
+            result = await update_user_academic_option("user-id", payload)
+
+        self.assertEqual(settings.academic_option, "minor")
+        self.assertEqual(settings.save_count, 1)
+        self.assertEqual(result.academic_option, "minor")
 
 
 if __name__ == "__main__":
