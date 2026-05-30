@@ -4,12 +4,15 @@ from pydantic import BaseModel, ConfigDict, Field, field_serializer
 
 from db.models.course import CourseCategoryName
 from db.models.roadmap import RoadmapCourseGrade
+from db.models.user_settings import AcademicOption
 from fastapi_app.schemas.roadmaps import SemesterNumber, semester_number_to_label
 
 RequirementKey = Literal[
     "basic",
     "major_required",
     "major_elective",
+    "major_total",
+    "capstone",
     "graduation_research",
 ]
 
@@ -18,7 +21,6 @@ CourseStatus = Literal[
     "in_progress",
     "planned",
     "missing_grade",
-    "excluded",
 ]
 
 
@@ -71,6 +73,7 @@ class CreditGPADTO(BaseModel):
     current_semester_number: SemesterNumber = Field(
         serialization_alias="currentSemester",
     )
+    academic_option: AcademicOption = Field(serialization_alias="academicOption")
     credits: CreditGPACreditsDTO
     gpa: float | None
     requirements: list[CreditGPARequirementDTO]

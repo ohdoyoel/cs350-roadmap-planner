@@ -3,6 +3,9 @@ from datetime import UTC, datetime
 from beanie import PydanticObjectId
 from fastapi import HTTPException, status
 
+from db.models.auth_session import AuthSession
+from db.models.email_verification import EmailVerification
+from db.models.roadmap import Roadmap
 from db.models.user import User
 from db.models.user_settings import UserSettings
 from fastapi_app.schemas.users import UserDTO, UserWithSettingsDTO
@@ -15,6 +18,8 @@ def serialize_user(user: User) -> UserDTO:
         id=str(user.id),
         name=user.name,
         kaist_email=user.kaist_email,
+        email_verified=user.email_verified,
+        email_verified_at=user.email_verified_at,
         created_at=user.created_at,
         updated_at=user.updated_at,
     )
@@ -64,3 +69,12 @@ async def create_user(
     )
     await user.insert()
     return user
+
+
+async def delete_user_account(user: User) -> None:
+    user_id = str(user.id)
+    await AuthSession.find(AuthSession.user_id == user_id).delete()
+    await EmailVerification.find(EmailVerification.user_id == user_id).delete()
+    await UserSettings.find(UserSettings.user_id == user_id).delete()
+    await Roadmap.find(Roadmap.user_id == user_id).delete()
+    await user.delete()

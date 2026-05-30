@@ -10,6 +10,7 @@ class CourseDTO(BaseModel):
     course_code: str = Field(serialization_alias="courseCode")
     course_name: str = Field(serialization_alias="courseName")
     course_name_en: str | None = Field(serialization_alias="courseNameEn")
+    description: str | None = None
     category: str
     sectors: list[str]
     offered_semesters: list[str] = Field(serialization_alias="offeredSemesters")
