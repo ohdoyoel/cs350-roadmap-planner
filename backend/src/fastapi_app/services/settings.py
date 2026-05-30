@@ -1,7 +1,9 @@
+from datetime import UTC, datetime
+
 from fastapi import HTTPException, status
 
 from db.models.user_settings import UserSettings
-from fastapi_app.schemas.users import SettingsDTO
+from fastapi_app.schemas.users import AcademicOptionUpdateRequest, SettingsDTO
 
 
 def serialize_settings(settings: UserSettings) -> SettingsDTO:
@@ -33,3 +35,17 @@ async def create_user_settings(
 
 async def get_user_settings(user_id: str) -> UserSettings | None:
     return await UserSettings.find_one(UserSettings.user_id == user_id)
+
+
+async def update_user_academic_option(
+    user_id: str,
+    payload: AcademicOptionUpdateRequest,
+) -> SettingsDTO:
+    settings = await get_user_settings(user_id)
+    if settings is None:
+        raise HTTPException(status_code=404, detail="Settings not found")
+
+    settings.academic_option = payload.academic_option
+    settings.updated_at = datetime.now(UTC)
+    await settings.save()
+    return serialize_settings(settings)

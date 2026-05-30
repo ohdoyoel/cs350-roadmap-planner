@@ -5,6 +5,7 @@ from db.models.roadmap import (
     Roadmap,
     RoadmapCourseGrade,
 )
+from db.models.user_settings import AcademicOption
 from fastapi_app.schemas.credit_gpa import (
     CourseStatus,
     CreditGPACourseDTO,
@@ -15,13 +16,30 @@ from fastapi_app.schemas.credit_gpa import (
     RequirementKey,
 )
 from fastapi_app.services.roadmaps import get_or_create_user_roadmap
+from fastapi_app.services.settings import get_user_settings
 
-REQUIREMENTS: list[tuple[RequirementKey, str, int]] = [
-    ("basic", "기초", 6),
-    ("major_required", "전공필수", 19),
-    ("major_elective", "전공선택", 30),
-    ("graduation_research", "졸업연구", 3),
-]
+RequirementDefinition = tuple[RequirementKey, str, int]
+
+REQUIREMENTS_BY_ACADEMIC_OPTION: dict[AcademicOption, list[RequirementDefinition]] = {
+    "major": [
+        ("basic", "기초", 6),
+        ("major_required", "전공필수", 19),
+        ("major_elective", "전공선택", 30),
+        ("capstone", "캡스톤", 1),
+        ("graduation_research", "졸업연구", 3),
+    ],
+    "minor": [
+        ("basic", "기초", 3),
+        ("major_required", "전공필수", 15),
+        ("major_total", "전공필수+전공선택", 21),
+    ],
+    "double_major": [
+        ("basic", "기초", 6),
+        ("major_required", "전공필수", 19),
+        ("major_total", "전공필수+전공선택", 40),
+        ("capstone", "캡스톤", 1),
+    ],
+}
 
 CATEGORY_TO_REQUIREMENT: dict[str, RequirementKey] = {
     "기초필수": "basic",
@@ -35,6 +53,27 @@ BASIC_REQUIRED_GROUPS = [
     {"course_codes": {"CS101"}, "credit": 3},
     {"course_codes": {"MAS109", "MAS110"}, "credit": 3},
 ]
+
+MINOR_BASIC_REQUIRED_GROUPS = [
+    {"course_codes": {"CS101"}, "credit": 3},
+]
+
+CAPSTONE_COURSE_CODES = {
+    "CS350",
+    "CS360",
+    "CS374",
+    "CS408",
+    "CS409",
+    "CS423",
+    "CS442",
+    "CS453",
+    "CS454",
+    "CS457",
+    "CS459",
+    "CS473",
+    "CS474",
+    "CS482",
+}
 
 GPA_POINTS = {
     "A+": 4.3,
@@ -187,24 +226,74 @@ async def build_analysis_courses(roadmap: Roadmap) -> list[CreditGPACourseDTO]:
     )
 
 
+def get_requirements(
+    academic_option: AcademicOption,
+) -> list[RequirementDefinition]:
+    return REQUIREMENTS_BY_ACADEMIC_OPTION[academic_option]
+
+
+def get_basic_required_groups(
+    academic_option: AcademicOption,
+) -> list[dict[str, object]]:
+    if academic_option == "minor":
+        return MINOR_BASIC_REQUIRED_GROUPS
+    return BASIC_REQUIRED_GROUPS
+
+
 def calculate_basic_requirement(
     courses: list[CreditGPACourseDTO],
+    academic_option: AcademicOption,
 ) -> tuple[int, int]:
     completed = 0
     in_progress = 0
 
-    for group in BASIC_REQUIRED_GROUPS:
+    for group in get_basic_required_groups(academic_option):
         group_courses = [
             course
             for course in courses
-            if course.course_code in group["course_codes"]
+            if course.course_code in group["course_codes"]  # type: ignore[operator]
         ]
         if any(is_earned_completed_course(course) for course in group_courses):
-            completed += group["credit"]
+            completed += int(group["credit"])
         elif any(is_in_progress_course(course) for course in group_courses):
-            in_progress += group["credit"]
+            in_progress += int(group["credit"])
 
     return completed, in_progress
+
+
+def is_major_course(course: CreditGPACourseDTO) -> bool:
+    return get_requirement_key(course.category) in {"major_required", "major_elective"}
+
+
+def calculate_major_total_remainder_requirement(
+    courses: list[CreditGPACourseDTO],
+) -> tuple[int, int]:
+    completed_total = sum(
+        course.credit
+        for course in courses
+        if is_major_course(course) and is_earned_completed_course(course)
+    )
+    completed_and_in_progress_total = completed_total + sum(
+        course.credit
+        for course in courses
+        if is_major_course(course) and is_in_progress_course(course)
+    )
+    return completed_total, completed_and_in_progress_total - completed_total
+
+
+def calculate_capstone_requirement(
+    courses: list[CreditGPACourseDTO],
+) -> tuple[int, int]:
+    capstone_courses = [
+        course
+        for course in courses
+        if course.course_code in CAPSTONE_COURSE_CODES
+    ]
+    if any(is_earned_completed_course(course) for course in capstone_courses):
+        return 1, 0
+    if any(is_in_progress_course(course) for course in capstone_courses):
+        return 0, 1
+    return 0, 0
 
 
 def calculate_category_requirement(
@@ -231,12 +320,21 @@ def calculate_category_requirement(
 
 def build_requirements(
     courses: list[CreditGPACourseDTO],
+    academic_option: AcademicOption = "major",
 ) -> list[CreditGPARequirementDTO]:
     requirements: list[CreditGPARequirementDTO] = []
+    requirement_definitions = get_requirements(academic_option)
 
-    for key, label, required_credits in REQUIREMENTS:
+    for key, label, required_credits in requirement_definitions:
         if key == "basic":
-            completed, in_progress = calculate_basic_requirement(courses)
+            completed, in_progress = calculate_basic_requirement(
+                courses,
+                academic_option,
+            )
+        elif key == "major_total":
+            completed, in_progress = calculate_major_total_remainder_requirement(courses)
+        elif key == "capstone":
+            completed, in_progress = calculate_capstone_requirement(courses)
         else:
             completed, in_progress = calculate_category_requirement(courses, key)
 
@@ -274,28 +372,34 @@ def calculate_gpa(courses: list[CreditGPACourseDTO]) -> float | None:
 
 def build_course_groups(
     courses: list[CreditGPACourseDTO],
+    academic_option: AcademicOption = "major",
 ) -> list[CreditGPACourseGroupDTO]:
     groups: dict[RequirementKey, list[CreditGPACourseDTO]] = {
         key: []
-        for key, _, _ in REQUIREMENTS
+        for key, _, _ in get_requirements(academic_option)
     }
 
     for course in courses:
         key = get_requirement_key(course.category)
-        if key is None:
-            continue
-        groups[key].append(course)
+        if key in groups:
+            groups[key].append(course)
+        if "major_total" in groups and is_major_course(course):
+            groups["major_total"].append(course)
+        if "capstone" in groups and course.course_code in CAPSTONE_COURSE_CODES:
+            groups["capstone"].append(course)
 
     return [
         CreditGPACourseGroupDTO(key=key, label=label, items=groups[key])
-        for key, label, _ in REQUIREMENTS
+        for key, label, _ in get_requirements(academic_option)
     ]
 
 
 async def get_my_credit_gpa(user_id: str) -> CreditGPADTO:
     roadmap = await get_or_create_user_roadmap(user_id)
+    settings = await get_user_settings(user_id)
+    academic_option = settings.academic_option if settings is not None else "major"
     courses = await build_analysis_courses(roadmap)
-    requirements = build_requirements(courses)
+    requirements = build_requirements(courses, academic_option)
 
     completed_credits = sum(
         course.credit
@@ -314,6 +418,7 @@ async def get_my_credit_gpa(user_id: str) -> CreditGPADTO:
 
     return CreditGPADTO(
         current_semester_number=roadmap.current_semester_number,
+        academic_option=academic_option,
         credits=CreditGPACreditsDTO(
             completed=completed_credits,
             in_progress=in_progress_credits,
@@ -321,5 +426,5 @@ async def get_my_credit_gpa(user_id: str) -> CreditGPADTO:
         ),
         gpa=calculate_gpa(courses),
         requirements=requirements,
-        courses=build_course_groups(courses),
+        courses=build_course_groups(courses, academic_option),
     )

@@ -64,6 +64,142 @@ class CreditGPAServiceTest(unittest.IsolatedAsyncioTestCase):
             status=status,
         )
 
+    def requirement_by_key(self, requirements):
+        return {requirement.key: requirement for requirement in requirements}
+
+    def test_major_requirements_include_capstone_and_research(self) -> None:
+        requirements = self.requirement_by_key(
+            credit_gpa_service.build_requirements([], "major"),
+        )
+
+        self.assertEqual(
+            list(requirements),
+            [
+                "basic",
+                "major_required",
+                "major_elective",
+                "capstone",
+                "graduation_research",
+            ],
+        )
+        self.assertEqual(requirements["basic"].required_credits, 6)
+        self.assertEqual(requirements["major_required"].required_credits, 19)
+        self.assertEqual(requirements["major_elective"].required_credits, 30)
+        self.assertEqual(requirements["capstone"].required_credits, 1)
+        self.assertEqual(requirements["graduation_research"].required_credits, 3)
+
+    def test_minor_requirements_use_minor_policy(self) -> None:
+        courses = [
+            self.analysis_course("CS101", 1, "기초필수", "A0", status="completed"),
+            self.analysis_course("MAS109", 1, "기초필수", "A0", status="completed"),
+            self.analysis_course("CS300", 1, "전공필수", "A0", status="completed"),
+            self.analysis_course("CS301", 1, "전공필수", "A0", status="completed"),
+            self.analysis_course("CS350", 1, "전공선택", "A0", status="completed"),
+        ]
+
+        requirements = self.requirement_by_key(
+            credit_gpa_service.build_requirements(courses, "minor"),
+        )
+
+        self.assertEqual(list(requirements), ["basic", "major_required", "major_total"])
+        self.assertEqual(requirements["basic"].required_credits, 3)
+        self.assertEqual(requirements["basic"].completed_credits, 3)
+        self.assertEqual(requirements["major_required"].required_credits, 15)
+        self.assertEqual(requirements["major_required"].completed_credits, 6)
+        self.assertEqual(requirements["major_total"].required_credits, 21)
+        self.assertEqual(requirements["major_total"].completed_credits, 9)
+        self.assertNotIn("capstone", requirements)
+        self.assertNotIn("graduation_research", requirements)
+
+    def test_double_major_requirements_use_double_major_policy(self) -> None:
+        requirements = self.requirement_by_key(
+            credit_gpa_service.build_requirements([], "double_major"),
+        )
+
+        self.assertEqual(
+            list(requirements),
+            ["basic", "major_required", "major_total", "capstone"],
+        )
+        self.assertEqual(requirements["basic"].required_credits, 6)
+        self.assertEqual(requirements["major_required"].required_credits, 19)
+        self.assertEqual(requirements["major_total"].required_credits, 40)
+        self.assertEqual(requirements["capstone"].required_credits, 1)
+        self.assertNotIn("graduation_research", requirements)
+
+    def test_major_total_counts_major_required_and_elective(self) -> None:
+        courses = [
+            self.analysis_course("CS300", 1, "전공필수", "A0", status="completed"),
+            self.analysis_course("CS301", 1, "전공필수", "A0", status="completed"),
+            self.analysis_course("CS350", 2, "전공선택", "A0", status="completed"),
+            self.analysis_course("CS360", 3, "전공선택", status="in_progress"),
+            self.analysis_course("CS101", 4, "기초필수", "A0", status="completed"),
+        ]
+
+        completed, in_progress = (
+            credit_gpa_service.calculate_major_total_remainder_requirement(courses)
+        )
+
+        self.assertEqual(completed, 9)
+        self.assertEqual(in_progress, 3)
+
+    def test_capstone_requirement_counts_completed_and_in_progress_only(self) -> None:
+        completed_courses = [
+            self.analysis_course("CS350", 1, "전공선택", "A0", status="completed"),
+        ]
+        in_progress_courses = [
+            self.analysis_course("CS360", 1, "전공선택", status="in_progress"),
+        ]
+        planned_courses = [
+            self.analysis_course("CS374", 5, "전공선택", status="planned"),
+        ]
+        non_capstone_courses = [
+            self.analysis_course("CS999", 1, "전공선택", "A0", status="completed"),
+        ]
+
+        self.assertEqual(
+            credit_gpa_service.calculate_capstone_requirement(completed_courses),
+            (1, 0),
+        )
+        self.assertEqual(
+            credit_gpa_service.calculate_capstone_requirement(in_progress_courses),
+            (0, 1),
+        )
+        self.assertEqual(
+            credit_gpa_service.calculate_capstone_requirement(planned_courses),
+            (0, 0),
+        )
+        self.assertEqual(
+            credit_gpa_service.calculate_capstone_requirement(non_capstone_courses),
+            (0, 0),
+        )
+
+    def test_course_groups_follow_academic_option_requirements(self) -> None:
+        courses = [
+            self.analysis_course("CS101", 1, "기초필수", "A0", status="completed"),
+            self.analysis_course("CS300", 1, "전공필수", "A0", status="completed"),
+            self.analysis_course("CS350", 1, "전공선택", "A0", status="completed"),
+        ]
+
+        major_groups = credit_gpa_service.build_course_groups(courses, "major")
+        minor_groups = credit_gpa_service.build_course_groups(courses, "minor")
+
+        self.assertEqual(
+            [group.key for group in major_groups],
+            [
+                "basic",
+                "major_required",
+                "major_elective",
+                "capstone",
+                "graduation_research",
+            ],
+        )
+        self.assertEqual(
+            [group.key for group in minor_groups],
+            ["basic", "major_required", "major_total"],
+        )
+        self.assertEqual(len(minor_groups[2].items), 2)
+        self.assertEqual(len(major_groups[3].items), 1)
+
     def test_basic_requirement_counts_mas109_or_mas110_once(self) -> None:
         courses = [
             self.analysis_course("CS101", 1, "기초필수", "A0", status="completed"),
@@ -199,11 +335,16 @@ class CreditGPAServiceTest(unittest.IsolatedAsyncioTestCase):
                 "fastapi_app.services.credit_gpa.load_catalog_courses_by_code",
                 new=AsyncMock(return_value=catalog_courses),
             ),
+            patch(
+                "fastapi_app.services.credit_gpa.get_user_settings",
+                new=AsyncMock(return_value=SimpleNamespace(academic_option="major")),
+            ),
         ):
             result = await credit_gpa_service.get_my_credit_gpa("user-id")
 
         dumped = result.model_dump(by_alias=True)
         self.assertEqual(dumped["currentSemester"], "2-1")
+        self.assertEqual(dumped["academicOption"], "major")
         self.assertEqual(dumped["credits"], {
             "completed": 6,
             "inProgress": 3,
@@ -212,7 +353,13 @@ class CreditGPAServiceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(dumped["gpa"], 4.0)
         self.assertEqual(
             [group["key"] for group in dumped["courses"]],
-            ["basic", "major_required", "major_elective", "graduation_research"],
+            [
+                "basic",
+                "major_required",
+                "major_elective",
+                "capstone",
+                "graduation_research",
+            ],
         )
         self.assertEqual(len(dumped["courses"][0]["items"]), 2)
         self.assertEqual(dumped["courses"][2]["items"][0]["status"], "in_progress")
@@ -336,6 +483,7 @@ class CreditGPAApiIntegrationTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         body = response.json()
         self.assertEqual(body["currentSemester"], "2-1")
+        self.assertEqual(body["academicOption"], "major")
         self.assertEqual(body["credits"], {
             "completed": 6,
             "inProgress": 3,

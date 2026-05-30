@@ -16,6 +16,15 @@ class SettingsDTO(BaseModel):
     graduation_year: int | None = Field(serialization_alias="graduationYear")
 
 
+class AcademicOptionUpdateRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    academic_option: AcademicOption = Field(
+        validation_alias="academicOption",
+        serialization_alias="academicOption",
+    )
+
+
 class UserDTO(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
