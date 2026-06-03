@@ -1,5 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, TextInput, View } from 'react-native';
+import { useLocale } from '@/lib/locale/LocaleContext';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   value: string;
@@ -7,16 +9,19 @@ type Props = {
   placeholder?: string;
 };
 
-export function SearchInput({ value, onChange, placeholder = '과목 검색' }: Props) {
+export function SearchInput({ value, onChange, placeholder }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { t } = useLocale();
+  const resolved = placeholder ?? t('과목 검색', 'Search courses');
   return (
-    <View style={styles.row}>
-      <Ionicons name="search" size={16} color="#9ca3af" />
+    <View style={[styles.row, { backgroundColor: isDark ? tokens.surface : '#f3f4f6' }]}>
+      <Ionicons name="search" size={16} color={tokens.subtext} />
       <TextInput
         value={value}
         onChangeText={onChange}
-        placeholder={placeholder}
-        placeholderTextColor="#9ca3af"
-        style={styles.input as never}
+        placeholder={resolved}
+        placeholderTextColor={tokens.subtext}
+        style={[styles.input, { color: tokens.text }] as never}
       />
     </View>
   );
@@ -29,14 +34,12 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    backgroundColor: '#f3f4f6',
     borderRadius: 12,
   },
   input: {
     flex: 1,
     fontSize: 14,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     outlineStyle: 'none',
   } as never,
 });

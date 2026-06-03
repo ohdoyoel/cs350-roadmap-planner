@@ -22,6 +22,7 @@ import {
   logout as apiLogout,
   signup as apiSignup,
 } from '@/lib/api/auth';
+import { type AcademicOption, updateAcademicOption } from '@/lib/api/users';
 
 const STORAGE_KEY = 'rp.session.v1';
 
@@ -38,6 +39,7 @@ type SessionContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (input: { email: string; password: string; name?: string }) => Promise<void>;
   signOut: () => Promise<void>;
+  setAcademicOption: (option: AcademicOption) => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -138,6 +140,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
+  const setAcademicOption = useCallback(async (option: AcademicOption) => {
+    const settings = await updateAcademicOption(option);
+    setMe((prev) => (prev ? { ...prev, settings } : prev));
+  }, []);
+
   const signOut = useCallback(async () => {
     try {
       if (tokenRef.current) await apiLogout();
@@ -148,8 +155,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [clearSession]);
 
   const value = useMemo<SessionContextValue>(
-    () => ({ ready, token, user, me, signIn, signUp, signOut }),
-    [ready, token, user, me, signIn, signUp, signOut],
+    () => ({ ready, token, user, me, signIn, signUp, signOut, setAcademicOption }),
+    [ready, token, user, me, signIn, signUp, signOut, setAcademicOption],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

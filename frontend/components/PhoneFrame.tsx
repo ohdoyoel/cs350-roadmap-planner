@@ -1,11 +1,13 @@
 import { ReactNode } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 export function PhoneFrame({ children }: { children: ReactNode }) {
+  const { tokens } = useTheme();
   if (Platform.OS !== 'web') return <>{children}</>;
   return (
-    <View style={styles.outer}>
-      <View style={styles.frame}>{children}</View>
+    <View style={[styles.outer, { backgroundColor: tokens.phoneOuter }]}>
+      <View style={[styles.frame, { backgroundColor: tokens.background }]}>{children}</View>
     </View>
   );
 }
@@ -13,7 +15,6 @@ export function PhoneFrame({ children }: { children: ReactNode }) {
 const styles = StyleSheet.create({
   outer: {
     flex: 1,
-    backgroundColor: '#e5e7eb',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
@@ -21,7 +22,6 @@ const styles = StyleSheet.create({
   frame: {
     width: 400,
     height: 844,
-    backgroundColor: '#fff',
     overflow: 'hidden',
     borderRadius: 18,
     ...Platform.select({

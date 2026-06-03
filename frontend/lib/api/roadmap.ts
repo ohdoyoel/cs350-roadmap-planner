@@ -27,11 +27,17 @@ export type ApiRoadmapCourseCustom = {
 
 export type ApiRoadmapCourse = ApiRoadmapCourseCatalog | ApiRoadmapCourseCustom;
 
+export type ApiPrerequisiteWarning = {
+  courseCode: string;
+  requiredCourseCode: string;
+};
+
 export type ApiRoadmap = {
   id: string;
   userId: string;
   currentSemester: string;
   courses: ApiRoadmapCourse[];
+  warnings: ApiPrerequisiteWarning[];
   createdAt: string;
   updatedAt: string;
 };

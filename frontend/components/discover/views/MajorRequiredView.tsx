@@ -11,6 +11,7 @@ import {
 import { CATEGORIES } from '@/constants/Categories';
 import { listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
+import { useLocale } from '@/lib/locale/LocaleContext';
 
 const AREA_COLOR = '#d1fae5';
 const LABEL_BG = '#bbf7d0';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 export function MajorRequiredView({ active, onSelectCategory }: Props) {
+  const { t, pick } = useLocale();
   const { data, loading, error } = useApi(
     () => listCourses({ category: '전공필수', includePrerequisites: true }),
     ['major_required'],
@@ -44,17 +46,19 @@ export function MajorRequiredView({ active, onSelectCategory }: Props) {
       width: 150,
       height: 30,
       inArea: false,
-      render: () => <RootNode courseCode="CS101" courseName="프로그래밍 기초" />,
+      render: () => (
+        <RootNode courseCode="CS101" courseName={t('프로그래밍 기초', 'Programming Basics')} />
+      ),
     };
 
     const chipNodes: TreeNode[] = DISCOVER_CATEGORIES.map((catId) => ({
       id: `chip_${catId}`,
-      width: 70,
+      width: 96,
       height: 26,
       inArea: false,
       render: () => (
         <ChipBox
-          label={CATEGORIES[catId].label_ko}
+          label={pick({ ko: CATEGORIES[catId].label_ko, en: CATEGORIES[catId].label_en })}
           active={catId === active}
           outlineColor={ACTIVE_OUTLINE[catId]}
           onPress={() => onSelectCategory(catId)}
@@ -65,9 +69,10 @@ export function MajorRequiredView({ active, onSelectCategory }: Props) {
     const courseNodes: TreeNode[] = data.map((course) => ({
       id: course.courseCode,
       width: 92,
-      height: 60,
+      height: 82,
       inArea: course.matched,
       subAreaId: course.matched && course.isKeyCourse ? 'key' : undefined,
+      selectable: true,
       render: () => <CourseCard course={course} />,
     }));
 
@@ -125,7 +130,7 @@ export function MajorRequiredView({ active, onSelectCategory }: Props) {
     });
 
     return { nodes: treeNodes, edges: [...dummyEdges, ...prereqEdges] };
-  }, [data, active, onSelectCategory]);
+  }, [data, active, onSelectCategory, t, pick]);
 
   if (loading) {
     return (
@@ -145,7 +150,7 @@ export function MajorRequiredView({ active, onSelectCategory }: Props) {
         maxWidth={TREE_MAX_WIDTH}
         areaBox={{
           color: AREA_COLOR,
-          label: '전공 필수 과목',
+          label: t('전공 필수 과목', 'Major Required Courses'),
           labelBg: LABEL_BG,
           labelTextColor: '#065f46',
         }}
@@ -153,7 +158,7 @@ export function MajorRequiredView({ active, onSelectCategory }: Props) {
           {
             id: 'key',
             color: KEY_AREA_COLOR,
-            label: '주요 과목',
+            label: t('주요 과목', 'Key Courses'),
             labelBg: KEY_LABEL_BG,
             labelTextColor: '#fff',
           },
@@ -169,7 +174,7 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#dc2626',
     textAlign: 'center',
     paddingVertical: 12,

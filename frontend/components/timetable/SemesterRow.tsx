@@ -1,8 +1,10 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CourseCard } from '@/components/timetable/CourseCard';
 import { Draggable } from '@/components/timetable/Draggable';
 import { Droppable } from '@/components/timetable/Droppable';
 import type { ApiCourse } from '@/lib/api/courses';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { Semester, TimetableCard } from '@/lib/mocks/timetableFixture';
 
 type Props = {
@@ -10,9 +12,11 @@ type Props = {
   cards: TimetableCard[];           // 실제 state
   visibleCards: TimetableCard[];    // chip 필터 적용된 표시 카드
   courseByCode: Map<string, ApiCourse>;
+  onDelete?: () => void;
 };
 
-export function SemesterRow({ semester, cards, visibleCards, courseByCode }: Props) {
+export function SemesterRow({ semester, cards, visibleCards, courseByCode, onDelete }: Props) {
+  const { t, pick } = useLocale();
   const totalCredits = cards.reduce(
     (sum, c) => sum + (courseByCode.get(c.code)?.credit.credit ?? 0),
     0,
@@ -45,8 +49,26 @@ export function SemesterRow({ semester, cards, visibleCards, courseByCode }: Pro
       ]}
     >
       <View style={styles.head}>
-        <Text style={styles.label}>{semester.label}</Text>
-        {totalCredits > 0 ? <Text style={styles.credit}>{totalCredits}학점</Text> : null}
+        <Text style={styles.label}>{pick({ ko: semester.label_ko, en: semester.label_en })}</Text>
+        <View style={styles.headRight}>
+          {totalCredits > 0 ? (
+            <Text style={styles.credit}>
+              {totalCredits}
+              {t('학점', ' credits')}
+            </Text>
+          ) : null}
+          {onDelete ? (
+            <Pressable
+              onPress={onDelete}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Delete semester"
+              style={({ pressed }) => [styles.deleteBtn, pressed && styles.deleteBtnPressed]}
+            >
+              <Ionicons name="close" size={14} color="#6b7280" />
+            </Pressable>
+          ) : null}
+        </View>
       </View>
       <ScrollView
         horizontal
@@ -83,14 +105,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deleteBtn: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnPressed: {
+    opacity: 0.6,
+  },
   label: {
     fontSize: 13,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#111827',
   },
   credit: {
     fontSize: 11,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#374151',
   },
   cards: {

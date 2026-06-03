@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { SUBTOPICS } from '@/constants/Subtopics';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { SubtopicId } from '@/lib/mocks/types';
 
 type Props = {
@@ -9,6 +10,7 @@ type Props = {
 
 export function SectorChip({ subtopicId, onPress }: Props) {
   const token = SUBTOPICS[subtopicId];
+  const { pick } = useLocale();
   return (
     <Pressable
       onPress={onPress}
@@ -16,7 +18,7 @@ export function SectorChip({ subtopicId, onPress }: Props) {
       accessibilityRole="button"
     >
       <Text style={styles.label} numberOfLines={2}>
-        {token.label_ko}
+        {pick({ ko: token.label_ko, en: token.label_en })}
       </Text>
     </Pressable>
   );
@@ -33,7 +35,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#fff',
     textAlign: 'center',
     fontWeight: '600',

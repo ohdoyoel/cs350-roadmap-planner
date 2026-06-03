@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SUBTOPICS } from '@/constants/Subtopics';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { SubtopicId } from '@/lib/mocks/types';
 import { SectorChip } from './SectorChip';
 
@@ -25,6 +26,7 @@ type Props = {
 };
 
 export function SectorChipGrid({ onSelectSector, onSelectKeyCourses }: Props) {
+  const { t } = useLocale();
   const rows = Math.max(LEFT_COLUMN.length, RIGHT_COLUMN.length + 1);
 
   return (
@@ -47,7 +49,7 @@ export function SectorChipGrid({ onSelectSector, onSelectKeyCourses }: Props) {
               style={[styles.slot, styles.keyChip]}
               accessibilityRole="button"
             >
-              <Text style={styles.keyLabel}>주요 과목</Text>
+              <Text style={styles.keyLabel}>{t('주요 과목', 'Key Courses')}</Text>
             </Pressable>
           ) : (
             <View style={styles.slot} />
@@ -80,7 +82,7 @@ const styles = StyleSheet.create({
   },
   keyLabel: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#fff',
     fontWeight: '600',
   },

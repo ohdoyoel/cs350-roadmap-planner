@@ -12,6 +12,7 @@ import { CATEGORIES } from '@/constants/Categories';
 import { SUBTOPICS } from '@/constants/Subtopics';
 import { listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { SubtopicId } from '@/lib/mocks/types';
 
 const TREE_MAX_WIDTH = 340;
@@ -31,6 +32,7 @@ type Props = {
 
 export function MajorElectiveSectorView({ subtopicId, active, onSelectCategory, onBack }: Props) {
   const token = SUBTOPICS[subtopicId];
+  const { t, pick } = useLocale();
 
   const { data, loading, error } = useApi(
     () => listCourses({ sector: token.label_ko, includePrerequisites: true }),
@@ -46,17 +48,19 @@ export function MajorElectiveSectorView({ subtopicId, active, onSelectCategory, 
       width: 150,
       height: 30,
       inArea: false,
-      render: () => <RootNode courseCode="CS101" courseName="프로그래밍 기초" />,
+      render: () => (
+        <RootNode courseCode="CS101" courseName={t('프로그래밍 기초', 'Programming Basics')} />
+      ),
     };
 
     const chipNodes: TreeNode[] = DISCOVER_CATEGORIES.map((catId) => ({
       id: `chip_${catId}`,
-      width: 70,
+      width: 96,
       height: 26,
       inArea: false,
       render: () => (
         <ChipBox
-          label={CATEGORIES[catId].label_ko}
+          label={pick({ ko: CATEGORIES[catId].label_ko, en: CATEGORIES[catId].label_en })}
           active={catId === active}
           outlineColor={ACTIVE_OUTLINE[catId]}
           onPress={() => onSelectCategory(catId)}
@@ -67,8 +71,9 @@ export function MajorElectiveSectorView({ subtopicId, active, onSelectCategory, 
     const courseNodes: TreeNode[] = data.map((course) => ({
       id: course.courseCode,
       width: 92,
-      height: 60,
+      height: 82,
       inArea: course.matched,
+      selectable: true,
       render: () => <CourseCard course={course} />,
     }));
 
@@ -119,7 +124,7 @@ export function MajorElectiveSectorView({ subtopicId, active, onSelectCategory, 
     });
 
     return { nodes: treeNodes, edges: [...dummyEdges, ...prereqEdges] };
-  }, [data, active, onSelectCategory]);
+  }, [data, active, onSelectCategory, t, pick]);
 
   if (loading) {
     return (
@@ -143,13 +148,13 @@ export function MajorElectiveSectorView({ subtopicId, active, onSelectCategory, 
         maxWidth={TREE_MAX_WIDTH}
         areaBox={{
           color: token.bgColor,
-          label: token.label_ko,
+          label: pick({ ko: token.label_ko, en: token.label_en }),
           labelBg: token.dotColor,
           labelTextColor: '#fff',
         }}
       />
       <Pressable onPress={onBack} style={styles.backLink} accessibilityRole="button">
-        <Text style={styles.backText}>← 분야 선택으로 돌아가기</Text>
+        <Text style={styles.backText}>{t('← 분야 선택으로 돌아가기', '← Back to sectors')}</Text>
       </Pressable>
     </View>
   );
@@ -165,12 +170,12 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#374151',
   },
   error: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#dc2626',
     textAlign: 'center',
   },

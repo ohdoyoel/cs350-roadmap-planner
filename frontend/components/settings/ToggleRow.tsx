@@ -1,4 +1,5 @@
 import { StyleSheet, Switch, Text, View } from 'react-native';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   label: string;
@@ -7,9 +8,10 @@ type Props = {
 };
 
 export function ToggleRow({ label, value, onValueChange }: Props) {
+  const { tokens } = useTheme();
   return (
-    <View style={styles.row}>
-      <Text style={styles.label}>{label}</Text>
+    <View style={[styles.row, { backgroundColor: tokens.surface }]}>
+      <Text style={[styles.label, { color: tokens.text }]}>{label}</Text>
       <Switch
         value={value}
         onValueChange={onValueChange}
@@ -27,12 +29,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 14,
-    backgroundColor: '#f3eafe',
     borderRadius: 18,
   },
   label: {
     fontSize: 18,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
 });

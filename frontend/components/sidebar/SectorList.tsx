@@ -1,6 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SUBTOPICS, SUBTOPIC_ORDER } from '@/constants/Subtopics';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { SubtopicId } from '@/lib/mocks/types';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   active: SubtopicId | null;
@@ -8,10 +10,12 @@ type Props = {
 };
 
 export function SectorList({ active, onSelect }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { t, isKo } = useLocale();
   return (
     <View style={styles.wrap}>
-      <View style={styles.headerRow}>
-        <Text style={styles.header}>과목 분류</Text>
+      <View style={[styles.headerRow, { backgroundColor: isDark ? tokens.surface : '#f3f4f6' }]}>
+        <Text style={[styles.header, { color: tokens.subtext }]}>{t('과목 분류', 'Subject Areas')}</Text>
       </View>
       <View style={styles.list}>
         {SUBTOPIC_ORDER.map((id) => {
@@ -21,9 +25,18 @@ export function SectorList({ active, onSelect }: Props) {
             <Pressable
               key={id}
               onPress={() => onSelect(isActive ? null : id)}
-              style={[styles.row, isActive && styles.rowActive]}
+              style={[
+                styles.row,
+                {
+                  backgroundColor: isDark ? tokens.surface : '#fff',
+                  borderColor: isActive ? '#7c3aed' : tokens.border,
+                  borderWidth: isActive ? 1.5 : 1,
+                },
+              ]}
             >
-              <Text style={styles.label}>{sub.label_ko}</Text>
+              <Text style={[styles.label, { color: tokens.text }]}>
+                {isKo ? sub.label_ko : sub.label_en}
+              </Text>
               <View style={[styles.dot, { backgroundColor: sub.dotColor }]} />
             </Pressable>
           );
@@ -36,15 +49,13 @@ export function SectorList({ active, onSelect }: Props) {
 const styles = StyleSheet.create({
   wrap: { gap: 6 },
   headerRow: {
-    backgroundColor: '#f3f4f6',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
   header: {
     fontSize: 12,
-    fontFamily: 'Georgia',
-    color: '#374151',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   list: { gap: 4 },
   row: {
@@ -53,19 +64,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: '#fff',
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  rowActive: {
-    borderColor: '#7c3aed',
-    borderWidth: 1.5,
   },
   label: {
     fontSize: 14,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   dot: {
     width: 10,

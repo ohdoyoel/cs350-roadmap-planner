@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   label: string;
@@ -8,18 +9,22 @@ type Props = {
 };
 
 export function ChipBox({ label, active, outlineColor, onPress }: Props) {
+  const { tokens, isDark } = useTheme();
   return (
     <Pressable
       onPress={onPress}
       style={[
         styles.chip,
         {
-          borderColor: active ? outlineColor : '#e5e7eb',
+          backgroundColor: isDark ? tokens.surface : '#fff',
+          borderColor: active ? outlineColor : tokens.border,
           borderWidth: active ? 2 : 1,
         },
       ]}
     >
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: tokens.text }]} ellipsizeMode="clip">
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -29,14 +34,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     paddingHorizontal: 6,
-    backgroundColor: '#fff',
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   label: {
     fontSize: 9,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    textAlign: 'center',
   },
 });

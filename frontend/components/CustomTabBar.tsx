@@ -1,14 +1,16 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 const ICON_INACTIVE = '#9ca3af';
 const ICON_ACTIVE = '#6366f1';
 const UNDERBAR_COLOR = '#6366f1';
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const { isDark } = useTheme();
   return (
     <View style={styles.wrapper} pointerEvents="box-none">
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: isDark ? '#1f1b2e' : '#fff' }]}>
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
           const { options } = descriptors[route.key];

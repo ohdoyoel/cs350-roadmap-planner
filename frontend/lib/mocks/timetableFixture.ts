@@ -6,10 +6,10 @@ import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
 
 export type FilterMode = 'grade' | 'subject' | 'credits';
 
-export const FILTER_MODES: { id: FilterMode; label_ko: string }[] = [
-  { id: 'grade', label_ko: '학년별' },
-  { id: 'subject', label_ko: '주제별' },
-  { id: 'credits', label_ko: '수강학점' },
+export const FILTER_MODES: { id: FilterMode; label_ko: string; label_en: string }[] = [
+  { id: 'grade', label_ko: '학년별', label_en: 'By Year' },
+  { id: 'subject', label_ko: '주제별', label_en: 'By Topic' },
+  { id: 'credits', label_ko: '수강학점', label_en: 'By Credit' },
 ];
 
 export const GRADE_CHIPS: CategoryId[] = [
@@ -58,7 +58,8 @@ export type SemesterStatus = 'past' | 'current' | 'future';
 
 export type Semester = {
   id: string;
-  label: string;
+  label_ko: string;
+  label_en: string;
   status: SemesterStatus;
   bgColor: string;
   cards: TimetableCard[];
@@ -67,25 +68,67 @@ export type Semester = {
 // 학기 슬롯 메타데이터. backend semester format ("<year>-<term>") 와 동일.
 export type SemesterSlot = {
   id: string;
-  label: string;
+  label_ko: string;
+  label_en: string;
   bgColor: string;
 };
 
 export const SEMESTER_SLOTS: SemesterSlot[] = [
-  { id: '1-1', label: '1st Spring', bgColor: '#e0e7ff' },
-  { id: '1-2', label: '1st Fall', bgColor: '#dbeafe' },
-  { id: '2-1', label: '2nd Spring', bgColor: '#cffafe' },
-  { id: '2-2', label: '2nd Fall', bgColor: '#fce7f3' },
-  { id: '3-1', label: '3rd Spring', bgColor: '#fef3c7' },
-  { id: '3-2', label: '3rd Fall', bgColor: '#ffedd5' },
-  { id: '4-1', label: '4th Spring', bgColor: '#d1fae5' },
-  { id: '4-2', label: '4th Fall', bgColor: '#fbcfe8' },
+  { id: '1-1', label_ko: '1학년 봄', label_en: '1st Spring', bgColor: '#e0e7ff' },
+  { id: '1-2', label_ko: '1학년 가을', label_en: '1st Fall', bgColor: '#dbeafe' },
+  { id: '2-1', label_ko: '2학년 봄', label_en: '2nd Spring', bgColor: '#cffafe' },
+  { id: '2-2', label_ko: '2학년 가을', label_en: '2nd Fall', bgColor: '#fce7f3' },
+  { id: '3-1', label_ko: '3학년 봄', label_en: '3rd Spring', bgColor: '#fef3c7' },
+  { id: '3-2', label_ko: '3학년 가을', label_en: '3rd Fall', bgColor: '#ffedd5' },
+  { id: '4-1', label_ko: '4학년 봄', label_en: '4th Spring', bgColor: '#d1fae5' },
+  { id: '4-2', label_ko: '4학년 가을', label_en: '4th Fall', bgColor: '#fbcfe8' },
 ];
 
 export function semesterToNumber(id: string): number {
   const [yr, term] = id.split('-').map(Number);
   if (!Number.isFinite(yr) || !Number.isFinite(term)) return 1;
   return (yr - 1) * 2 + term;
+}
+
+const EXTRA_BG_PALETTE = ['#ede9fe', '#fee2e2', '#e0f2fe', '#dcfce7', '#fef9c3', '#ffe4e6'];
+
+function ordinalLabel(year: number): string {
+  if (year === 1) return '1st';
+  if (year === 2) return '2nd';
+  if (year === 3) return '3rd';
+  return `${year}th`;
+}
+
+// 8 슬롯(4년) 밖 학기. id 예: "5-1", "5-2", "6-1".
+export function buildExtraSemesterSlot(id: string): SemesterSlot {
+  const [yrStr, termStr] = id.split('-');
+  const yr = Number(yrStr) || 5;
+  const term = Number(termStr) || 1;
+  const termEn = term === 1 ? 'Spring' : 'Fall';
+  const termKo = term === 1 ? '봄' : '가을';
+  const paletteIdx = ((yr - 5) * 2 + (term - 1)) % EXTRA_BG_PALETTE.length;
+  return {
+    id,
+    label_ko: `${yr}학년 ${termKo}`,
+    label_en: `${ordinalLabel(yr)} ${termEn}`,
+    bgColor: EXTRA_BG_PALETTE[Math.max(0, paletteIdx)],
+  };
+}
+
+// SEMESTER_SLOTS 의 마지막 다음 학기 id.
+export function nextExtraSemesterId(existing: Iterable<string>): string {
+  const used = new Set(existing);
+  let yr = 5;
+  let term = 1;
+  while (used.has(`${yr}-${term}`)) {
+    if (term === 1) {
+      term = 2;
+    } else {
+      yr += 1;
+      term = 1;
+    }
+  }
+  return `${yr}-${term}`;
 }
 
 export function deriveSemesterStatus(id: string, currentId: string): SemesterStatus {

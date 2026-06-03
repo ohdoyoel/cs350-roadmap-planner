@@ -2,7 +2,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { CATEGORIES, categoryIdFromKo } from '@/constants/Categories';
 import { SUBTOPICS, subtopicIdFromKo } from '@/constants/Subtopics';
 import type { ApiCourse } from '@/lib/api/courses';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { TimetableCard } from '@/lib/mocks/timetableFixture';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   card: TimetableCard;
@@ -10,39 +12,55 @@ type Props = {
 };
 
 export function CourseCard({ card, course }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { pick, isKo } = useLocale();
   const variant = card.variant ?? 'big';
-  const name = course?.courseName ?? card.code;
+  const name = course
+    ? pick({ ko: course.courseName, en: course.courseNameEn })
+    : card.code;
   const categoryId = course ? categoryIdFromKo(course.category) : undefined;
-  const categoryLabel = categoryId ? CATEGORIES[categoryId].label_ko : course?.category ?? '';
+  const categoryLabel = categoryId
+    ? (isKo ? CATEGORIES[categoryId].label_ko : CATEGORIES[categoryId].label_en)
+    : course?.category ?? '';
   const credit = course?.credit.credit;
   const subtopicIds = (course?.sectors ?? [])
     .map((label) => subtopicIdFromKo(label))
     .filter((id): id is NonNullable<typeof id> => Boolean(id));
 
+  const cardBg = isDark ? tokens.surface : '#fff';
+  const cardBorder = tokens.border;
+
   if (variant === 'small') {
     return (
-      <View style={styles.smallCard}>
+      <View style={[styles.smallCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
         <View style={styles.smallHead}>
-          <Text style={styles.smallCode}>{card.code}</Text>
+          <Text style={[styles.smallCode, { color: tokens.text }]}>{card.code}</Text>
           <DotStack subtopicIds={subtopicIds} />
         </View>
-        <Text style={styles.smallName} numberOfLines={2}>
+        <Text style={[styles.smallName, { color: tokens.subtext }]} numberOfLines={2}>
           {name}
         </Text>
       </View>
     );
   }
   return (
-    <View style={styles.bigCard}>
+    <View style={[styles.bigCard, { backgroundColor: cardBg, borderColor: cardBorder }]}>
       <View style={styles.bigHead}>
-        <Text style={styles.bigCode}>{card.code}</Text>
+        <Text style={[styles.bigCode, { color: tokens.text }]}>{card.code}</Text>
         <DotStack subtopicIds={subtopicIds} />
       </View>
-      <Text style={styles.bigName} numberOfLines={2}>
+      <Text style={[styles.bigName, { color: tokens.subtext }]} numberOfLines={2}>
         {name}
       </Text>
-      {categoryLabel ? <Text style={styles.bigCategory}>{categoryLabel}</Text> : null}
-      {credit != null ? <Text style={styles.bigCredit}>{credit}학점</Text> : null}
+      {categoryLabel ? (
+        <Text style={[styles.bigCategory, { color: tokens.subtext }]}>{categoryLabel}</Text>
+      ) : null}
+      {credit != null ? (
+        <Text style={[styles.bigCredit, { color: tokens.subtext }]}>
+          {credit}
+          {isKo ? '학점' : ' credits'}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -64,11 +82,10 @@ const styles = StyleSheet.create({
     minHeight: 64,
     paddingHorizontal: 8,
     paddingVertical: 6,
-    backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
     gap: 2,
+    overflow: 'hidden',
   },
   smallHead: {
     flexDirection: 'row',
@@ -77,13 +94,11 @@ const styles = StyleSheet.create({
   },
   smallCode: {
     fontSize: 10,
-    fontFamily: 'Georgia',
-    color: '#111827',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   smallName: {
     fontSize: 10,
-    fontFamily: 'Georgia',
-    color: '#374151',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     lineHeight: 13,
   },
   bigCard: {
@@ -91,11 +106,10 @@ const styles = StyleSheet.create({
     minHeight: 82,
     paddingHorizontal: 8,
     paddingVertical: 8,
-    backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
     gap: 2,
+    overflow: 'hidden',
   },
   bigHead: {
     flexDirection: 'row',
@@ -104,25 +118,21 @@ const styles = StyleSheet.create({
   },
   bigCode: {
     fontSize: 11,
-    fontFamily: 'Georgia',
-    color: '#111827',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   bigName: {
     fontSize: 11,
-    fontFamily: 'Georgia',
-    color: '#374151',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     lineHeight: 14,
   },
   bigCategory: {
     fontSize: 9,
-    fontFamily: 'Georgia',
-    color: '#6b7280',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     marginTop: 2,
   },
   bigCredit: {
     fontSize: 9,
-    fontFamily: 'Georgia',
-    color: '#6b7280',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   dotStack: {
     flexDirection: 'row',

@@ -1,25 +1,28 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SUBTOPICS, subtopicIdFromKo } from '@/constants/Subtopics';
 import type { ApiCourse } from '@/lib/api/courses';
-import { useFocus } from '@/lib/discover/FocusContext';
+import { useLocale } from '@/lib/locale/LocaleContext';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   course: ApiCourse;
 };
 
 export function CourseCard({ course }: Props) {
-  const { focus } = useFocus();
-  const isFocused = focus?.code === course.courseCode;
+  const { tokens, isDark } = useTheme();
+  const { pick } = useLocale();
   const semesterLabel = course.offeredSemesters.join('/');
+  const displayName = pick({ ko: course.courseName, en: course.courseNameEn });
+
+  const baseBg = isDark ? tokens.surface : '#fff';
   const cardStyle = [
     styles.card,
-    course.isKeyCourse && styles.cardKey,
-    isFocused && styles.cardFocused,
+    { backgroundColor: baseBg, borderColor: tokens.border },
   ];
   return (
     <View style={cardStyle}>
       <View style={styles.header}>
-        <Text style={styles.code}>{course.courseCode}</Text>
+        <Text style={[styles.code, { color: tokens.text }]}>{course.courseCode}</Text>
         <View style={styles.dots}>
           {course.sectors.map((label) => {
             const id = subtopicIdFromKo(label);
@@ -28,12 +31,12 @@ export function CourseCard({ course }: Props) {
           })}
         </View>
       </View>
-      <Text style={styles.name} numberOfLines={2}>
-        {course.courseName}
+      <Text style={[styles.name, { color: tokens.text }]} numberOfLines={2}>
+        {displayName}
       </Text>
       <View style={styles.footer}>
-        <Text style={styles.meta}>{semesterLabel}</Text>
-        <Text style={styles.meta}>{course.credit.raw}</Text>
+        <Text style={[styles.meta, { color: tokens.subtext }]}>{semesterLabel}</Text>
+        <Text style={[styles.meta, { color: tokens.subtext }]}>{course.credit.raw}</Text>
       </View>
     </View>
   );
@@ -44,18 +47,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 7,
     paddingVertical: 6,
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#d4d4d8',
     borderRadius: 6,
     gap: 3,
-  },
-  cardKey: {
-    borderColor: '#92400e',
-  },
-  cardFocused: {
-    backgroundColor: '#d1d5db',
-    borderColor: '#6b7280',
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
@@ -64,8 +59,7 @@ const styles = StyleSheet.create({
   },
   code: {
     fontSize: 10,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   dots: {
     flexDirection: 'row',
@@ -78,8 +72,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 9,
-    fontFamily: 'Georgia',
-    color: '#1f2937',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
   footer: {
     gap: 1,
@@ -87,7 +80,6 @@ const styles = StyleSheet.create({
   },
   meta: {
     fontSize: 8,
-    fontFamily: 'Georgia',
-    color: '#6b7280',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
 });
