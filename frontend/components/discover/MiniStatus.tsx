@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 export type MiniStatusItem = {
   label: string;
@@ -11,10 +12,11 @@ type Props = {
 };
 
 export function MiniStatus({ items }: Props) {
+  const { tokens } = useTheme();
   return (
     <View style={styles.container}>
       {items.map((item) => (
-        <Text key={item.label} style={styles.line}>
+        <Text key={item.label} style={[styles.line, { color: tokens.subtext }]}>
           {item.label}: {item.earned} / {item.total}
         </Text>
       ))}
@@ -29,7 +31,6 @@ const styles = StyleSheet.create({
   },
   line: {
     fontSize: 11,
-    fontFamily: 'Georgia',
-    color: '#374151',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
 });

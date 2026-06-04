@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CATEGORIES } from '@/constants/Categories';
 import { SUBTOPICS } from '@/constants/Subtopics';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import {
   CREDIT_CHIPS,
   GRADE_CHIPS,
@@ -8,6 +9,7 @@ import {
   type FilterMode,
 } from '@/lib/mocks/timetableFixture';
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   mode: FilterMode;
@@ -24,6 +26,8 @@ export function FilterChipRow({
   onGradeChange,
   onSubjectChange,
 }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { isKo } = useLocale();
   if (mode === 'grade') {
     return (
       <Row>
@@ -37,7 +41,7 @@ export function FilterChipRow({
               style={[styles.chip, { backgroundColor: cat.chipColor }, active && styles.chipActive]}
             >
               <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                {cat.label_ko}
+                {isKo ? cat.label_ko : cat.label_en}
               </Text>
             </Pressable>
           );
@@ -59,7 +63,7 @@ export function FilterChipRow({
             >
               <View style={[styles.dot, { backgroundColor: sub.dotColor }]} />
               <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                {sub.label_ko}
+                {isKo ? sub.label_ko : sub.label_en}
               </Text>
             </Pressable>
           );
@@ -74,9 +78,15 @@ export function FilterChipRow({
         const cat = CATEGORIES[chip.id];
         const plannedSuffix = chip.planned > 0 ? `(+${chip.planned})` : '';
         return (
-          <View key={chip.id} style={[styles.creditChip, { borderColor: cat.chipColor }]}>
-            <Text style={styles.creditChipLabel}>{cat.label_ko}</Text>
-            <Text style={styles.creditChipValue}>
+          <View
+            key={chip.id}
+            style={[
+              styles.creditChip,
+              { borderColor: cat.chipColor, backgroundColor: isDark ? tokens.surface : '#fff' },
+            ]}
+          >
+            <Text style={[styles.creditChipLabel, { color: tokens.subtext }]}>{isKo ? cat.label_ko : cat.label_en}</Text>
+            <Text style={[styles.creditChipValue, { color: tokens.text }]}>
               {chip.earned}
               {plannedSuffix}/{chip.required}
             </Text>
@@ -119,11 +129,11 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 11,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#374151',
   },
   chipTextActive: {
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     fontWeight: '600',
     color: '#111',
   },
@@ -142,12 +152,12 @@ const styles = StyleSheet.create({
   },
   creditChipLabel: {
     fontSize: 10,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#374151',
   },
   creditChipValue: {
     fontSize: 11,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#111827',
     marginTop: 1,
   },

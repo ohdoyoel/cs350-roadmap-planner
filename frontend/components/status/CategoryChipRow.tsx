@@ -1,6 +1,8 @@
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { FilterChipId } from '@/lib/mocks/statusFixture';
 import { FILTER_CHIPS } from '@/lib/mocks/statusFixture';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   active: FilterChipId;
@@ -8,6 +10,8 @@ type Props = {
 };
 
 export function CategoryChipRow({ active, onSelect }: Props) {
+  const { tokens } = useTheme();
+  const { pick } = useLocale();
   return (
     <ScrollView
       horizontal
@@ -22,7 +26,14 @@ export function CategoryChipRow({ active, onSelect }: Props) {
             onPress={() => onSelect?.(chip.id)}
             style={[styles.chip, isActive && styles.chipActive]}
           >
-            <Text style={[styles.text, isActive && styles.textActive]}>{chip.label_en}</Text>
+            <Text
+              style={[
+                styles.text,
+                { color: isActive ? '#fff' : tokens.subtext },
+              ]}
+            >
+              {pick({ ko: chip.label_ko, en: chip.label_en })}
+            </Text>
           </Pressable>
         );
       })}
@@ -45,10 +56,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 12,
-    fontFamily: 'Georgia',
-    color: '#6b7280',
-  },
-  textActive: {
-    color: '#fff',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
 });

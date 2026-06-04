@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { RequirementGroup } from '@/lib/mocks/statusFixture';
 
 type Props = {
@@ -10,9 +11,12 @@ const PALETTE: Record<RequirementGroup['id'], { bg: string; fill: string }> = {
   elective_major: { bg: '#fce7f3', fill: '#ec4899' },
   other_requirements: { bg: '#d1fae5', fill: '#10b981' },
   graduation_research: { bg: '#fed7aa', fill: '#f59e0b' },
+  major_total: { bg: '#e0e7ff', fill: '#6366f1' },
+  capstone: { bg: '#fef9c3', fill: '#eab308' },
 };
 
 export function RequirementProgressList({ groups }: Props) {
+  const { t, pick } = useLocale();
   return (
     <View style={styles.list}>
       {groups.map((group) => {
@@ -22,9 +26,9 @@ export function RequirementProgressList({ groups }: Props) {
         return (
           <View key={group.id} style={[styles.row, { backgroundColor: palette.bg }]}>
             <View style={styles.header}>
-              <Text style={styles.label}>{group.label_en}</Text>
+              <Text style={styles.label}>{pick({ ko: group.label_ko, en: group.label_en })}</Text>
               <Text style={styles.value}>
-                {group.earned} / {group.required} credits
+                {group.earned} / {group.required} {t('학점', 'credits')}
                 {group.planned > 0 ? ` (+${group.planned})` : ''}
               </Text>
             </View>
@@ -60,12 +64,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 13,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#374151',
   },
   value: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#374151',
   },
   barTrack: {

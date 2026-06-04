@@ -1,6 +1,95 @@
-import { ReactNode, useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Defs, Marker, Path, Rect } from 'react-native-svg';
+import { useFocus } from '@/lib/discover/FocusContext';
+
+// requestAnimationFrame 기반 부드러운 숫자 보간. Path 같이 Animated.Value 를 받지 못하는
+// SVG 요소도 opacity 를 transition 시킬 수 있다 (매 프레임 re-render 함). edge 수가 많으면
+// CPU 부담이 늘어나지만 트리 규모상 60fps 유지 가능.
+function useSmoothNumber(target: number, duration = 220): number {
+  const [value, setValue] = useState(target);
+  const fromRef = useRef(target);
+  const toRef = useRef(target);
+  const startRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (target === toRef.current) return;
+    fromRef.current = value;
+    toRef.current = target;
+    startRef.current = performance.now();
+    const step = () => {
+      const elapsed = performance.now() - startRef.current;
+      const p = Math.min(1, elapsed / duration);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - p, 3);
+      const next = fromRef.current + (toRef.current - fromRef.current) * eased;
+      setValue(next);
+      if (p < 1) rafRef.current = requestAnimationFrame(step);
+      else rafRef.current = null;
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+    };
+  // value 는 ref-like 용도라 deps 에서 제외 (target 변경 시에만 재시작).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target, duration]);
+
+  return value;
+}
+
+function SmoothPath({
+  opacityTarget,
+  ...pathProps
+}: {
+  opacityTarget: number;
+  d: string;
+  stroke: string;
+  strokeWidth: number;
+  fill: string;
+  markerEnd: string;
+}) {
+  const opacity = useSmoothNumber(opacityTarget, 220);
+  return <Path {...pathProps} opacity={opacity} />;
+}
+
+// 220ms 동안 opacity 부드럽게 보간 — node wrapper 전용.
+// Animated.createAnimatedComponent(Pressable) 가 web 환경에서 style 객체를
+// 잘못 평탄화하는 이슈가 있어 Animated.View + 내부 Pressable 합성.
+function FadeView({
+  opacityTarget,
+  children,
+  style,
+  onPress,
+  viewRef,
+}: {
+  opacityTarget: number;
+  children: ReactNode;
+  style: object;
+  onPress?: (ev: { stopPropagation: () => void }) => void;
+  viewRef?: (node: unknown) => void;
+}) {
+  const opacity = useRef(new Animated.Value(opacityTarget)).current;
+  useEffect(() => {
+    Animated.timing(opacity, {
+      toValue: opacityTarget,
+      duration: 220,
+      useNativeDriver: true,
+    }).start();
+  }, [opacity, opacityTarget]);
+  return (
+    <Animated.View style={[style, { opacity }]} ref={viewRef as never}>
+      {onPress ? (
+        <Pressable style={StyleSheet.absoluteFill} onPress={onPress as never}>
+          {children}
+        </Pressable>
+      ) : (
+        children
+      )}
+    </Animated.View>
+  );
+}
 
 export type TreeNode = {
   id: string;
@@ -11,6 +100,8 @@ export type TreeNode = {
   subAreaId?: string;       // 보조 sub-area 그룹 키 (예: 'key')
   // 'area_top' → areaBox 위 가장자리 가운데로 위치 강제 (label 화살표 끝점용).
   pinTo?: 'area_top' | 'sub_top';
+  // true 면 탭 시 highlight 대상으로 선택. 기본 false.
+  selectable?: boolean;
 };
 
 export type TreeEdge = {
@@ -170,10 +261,18 @@ export function TreeCanvas({
       const othersConnected = innerNodeList.filter(
         (n) => !isolated.includes(n) && !n.subAreaId,
       );
-      if (isolated.length > 0 && othersConnected.length > 0) {
-        const baseMax = Math.max(
-          ...othersConnected.map((n) => rankOf.get(n.id)!),
-        );
+      const skipIsolatedGuard =
+        typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).get('bug') ===
+          'iter5before';
+      if (
+        isolated.length > 0 &&
+        (skipIsolatedGuard || othersConnected.length > 0)
+      ) {
+        const baseMax =
+          othersConnected.length > 0
+            ? Math.max(...othersConnected.map((n) => rankOf.get(n.id)!))
+            : 0; // pre-fix bug: rank 0 base when every inner is isolated.
         isolated.forEach((n) => {
           rankOf.set(n.id, baseMax + 1);
           isolatedInnerSet.add(n.id);
@@ -207,6 +306,49 @@ export function TreeCanvas({
         return a.localeCompare(b, undefined, { numeric: true });
       });
     });
+
+    // === HISTORICAL-STATE PROBES (temporary; activated only by URL param) ===
+    // Used to re-capture iter1.png / iter3.png / iter5-before.png for the
+    // report. The default code path (no URL param) is unchanged.
+    const bugProbe =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('bug')
+        : null;
+    // === /HISTORICAL-STATE PROBES ===
+
+    // === ITER.9 OSCM PROBE (temporary; activated only by URL param) ===
+    // ?oscm=asc / ?oscm=desc replaces the deterministic sort above with a
+    // per-rank barycenter sort that uses the given tie-break direction.
+    // Used once to capture Run A and Run B for the report.
+    const oscmTie =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('oscm')
+        : null;
+    if (oscmTie === 'asc' || oscmTie === 'desc') {
+      for (let i = 1; i < sortedRanks.length; i++) {
+        const r = sortedRanks[i];
+        const prev = ranksMap.get(sortedRanks[i - 1])!;
+        const idx = new Map<string, number>(prev.map((id, j) => [id, j]));
+        ranksMap.get(r)!.sort((a, b) => {
+          const baryOf = (id: string): number => {
+            const ps = parents.get(id) ?? [];
+            const vals = ps
+              .map((p) => idx.get(p))
+              .filter((v): v is number => v !== undefined);
+            return vals.length === 0
+              ? Number.POSITIVE_INFINITY
+              : vals.reduce((s, v) => s + v, 0) / vals.length;
+          };
+          const ba = baryOf(a);
+          const bb = baryOf(b);
+          if (ba !== bb) return ba - bb;
+          return oscmTie === 'asc'
+            ? a.localeCompare(b, undefined, { numeric: true })
+            : b.localeCompare(a, undefined, { numeric: true });
+        });
+      }
+    }
+    // === /ITER.9 OSCM PROBE ===
 
     // wrap: row 안 노드 width 합 기반 (가변 width 지원)
     const innerW = maxWidth - 2 * marginX;
@@ -402,19 +544,32 @@ export function TreeCanvas({
       const center = maxWidth / 2;
       type Group = { parent: string; edges: TreeEdge[]; parentX: number; avgToX: number };
       const groupMap = new Map<string, Group>();
+      // bug=iter3 probe: each edge gets its own group (no per-parent
+      // sharing), reproducing the dense forest of parallel lanes the report
+      // describes for Iter.3.
+      // bug=iter1 probe: each *destination* gets a shared group (regardless
+      // of source), which causes arrows from CS211/CS230 -> CS311 to merge
+      // into a single lane high above the destination, reproducing Iter.1.
+      const groupKeyFor = (e: TreeEdge): string =>
+        bugProbe === 'iter3'
+          ? `${e.from}->${e.to}` // per-edge
+          : bugProbe === 'iter1'
+            ? e.to // per-destination
+            : e.from; // default: per-parent
       multiRowEdges.forEach((e) => {
         const fromPos = positions.get(e.from);
         const toPos = positions.get(e.to);
         if (!fromPos || !toPos) return;
-        if (!groupMap.has(e.from)) {
-          groupMap.set(e.from, {
-            parent: e.from,
+        const key = groupKeyFor(e);
+        if (!groupMap.has(key)) {
+          groupMap.set(key, {
+            parent: key,
             edges: [],
             parentX: fromPos.x,
             avgToX: 0,
           });
         }
-        const g = groupMap.get(e.from)!;
+        const g = groupMap.get(key)!;
         g.edges.push(e);
       });
       groupMap.forEach((g) => {
@@ -518,9 +673,14 @@ export function TreeCanvas({
       // group by (kind, key) where key = parent for enter/adjacent, edge id for exit
       type Group = { kind: Req['kind']; key: string; edges: TreeEdge[]; sortKey: number };
       const groupMap = new Map<string, Group>();
+      // bug=iter3 probe: every edge gets its own slot (no per-parent
+      // sharing for enter/adjacent), reproducing the dense parallel-lane
+      // forest described in Iter.3 of the report.
+      const perEdgeSlots = bugProbe === 'iter3';
       reqs.forEach((req) => {
-        const key =
-          req.kind === 'exit'
+        const key = perEdgeSlots
+          ? `${req.kind}:${req.edge.from}->${req.edge.to}`
+          : req.kind === 'exit'
             ? `exit:${req.edge.from}->${req.edge.to}`
             : `${req.kind}:${req.edge.from}`;
         if (!groupMap.has(key)) {
@@ -741,10 +901,72 @@ export function TreeCanvas({
     };
   }, [nodes, edges, maxWidth, hSep, vSep, marginX, marginY, areaBox, subAreas]);
 
+  // 사용자가 탭한 노드 + 그와 prereq chain 으로 연결된 노드만 강조.
+  // null 이면 모두 강조.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { focus } = useFocus();
+  const nodeRefsRef = useRef<Map<string, unknown>>(new Map());
+  // 사이드바의 'Find in tree' 가 focus 를 세팅하면 동일 노드를 selectedId 로 잡아 chain 강조 + 화면 스크롤.
+  useEffect(() => {
+    if (!focus) return;
+    if (!nodes.some((n) => n.id === focus.code)) return;
+    setSelectedId(focus.code);
+    // layout 적용 직후에 스크롤 — node ref 가 DOM 에 mount 되었는지 보장 위해 다음 프레임.
+    requestAnimationFrame(() => {
+      const node = nodeRefsRef.current.get(focus.code) as { scrollIntoView?: (o: object) => void } | null;
+      node?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+    });
+  }, [focus, nodes]);
+
+  const connectedIds = useMemo<Set<string> | null>(() => {
+    if (!selectedId) return null;
+    // BFS: visible edges + invisible edges that bridge selection through area labels
+    // (예: area_label → innerRoot). 단순 layout 용 invisible edge (outer → area_label) 는 제외.
+    const areaLabelIds = new Set(
+      nodes.filter((n) => n.pinTo === 'area_top' || n.pinTo === 'sub_top').map((n) => n.id),
+    );
+    const ups = new Map<string, string[]>();   // child → parents
+    const downs = new Map<string, string[]>(); // parent → children
+    edges.forEach((e) => {
+      if (e.invisible && areaLabelIds.has(e.to)) return;
+      if (!ups.has(e.to)) ups.set(e.to, []);
+      ups.get(e.to)!.push(e.from);
+      if (!downs.has(e.from)) downs.set(e.from, []);
+      downs.get(e.from)!.push(e.to);
+    });
+    const set = new Set<string>([selectedId]);
+    const queue: Array<[string, 'up' | 'down']> = [
+      [selectedId, 'up'],
+      [selectedId, 'down'],
+    ];
+    while (queue.length > 0) {
+      const [id, dir] = queue.shift()!;
+      const next = (dir === 'up' ? ups.get(id) : downs.get(id)) ?? [];
+      for (const n of next) {
+        if (set.has(n)) continue;
+        set.add(n);
+        queue.push([n, dir]);
+      }
+    }
+    return set;
+  }, [selectedId, edges, nodes]);
+
+  const isDim = (id: string) => connectedIds !== null && !connectedIds.has(id);
+  const edgeDim = (from: string, to: string) =>
+    connectedIds !== null && !(connectedIds.has(from) && connectedIds.has(to));
+
+  // 빈 영역 탭 시 선택 해제.
+  const handleBackdropPress = () => {
+    if (selectedId) setSelectedId(null);
+  };
+
   if (nodes.length === 0) return null;
 
   return (
-    <View style={{ width: layout.width, height: layout.height }}>
+    <Pressable
+      onPress={handleBackdropPress}
+      style={{ width: layout.width, height: layout.height }}
+    >
       <Svg
         width={layout.width}
         height={layout.height}
@@ -798,14 +1020,16 @@ export function TreeCanvas({
         })}
         {layout.edgePaths.map((edge, i) => {
           const d = pointsToRoundedPath(edge.points);
+          const dim = edgeDim(edge.from, edge.to);
           return (
-            <Path
+            <SmoothPath
               key={`${edge.from}-${edge.to}-${i}`}
               d={d}
               stroke={EDGE_COLOR}
               strokeWidth={1.5}
               fill="none"
               markerEnd="url(#arrowhead)"
+              opacityTarget={dim ? 0.15 : 1}
             />
           );
         })}
@@ -813,19 +1037,34 @@ export function TreeCanvas({
       {nodes.map((n) => {
         const pos = layout.positions.get(n.id);
         if (!pos) return null;
+        const dim = isDim(n.id);
+        const wrapperStyle = {
+          position: 'absolute' as const,
+          left: pos.x - n.width / 2,
+          top: pos.y - n.height / 2,
+          width: n.width,
+          height: n.height,
+        };
         return (
-          <View
+          <FadeView
             key={n.id}
-            style={{
-              position: 'absolute',
-              left: pos.x - n.width / 2,
-              top: pos.y - n.height / 2,
-              width: n.width,
-              height: n.height,
+            opacityTarget={dim ? 0.25 : 1}
+            style={wrapperStyle}
+            viewRef={(node) => {
+              if (node) nodeRefsRef.current.set(n.id, node);
+              else nodeRefsRef.current.delete(n.id);
             }}
+            onPress={
+              n.selectable
+                ? (ev) => {
+                    ev.stopPropagation();
+                    setSelectedId((prev) => (prev === n.id ? null : n.id));
+                  }
+                : undefined
+            }
           >
             {n.render()}
-          </View>
+          </FadeView>
         );
       })}
       {areaBox?.label && layout.areaBounds ? (
@@ -849,7 +1088,7 @@ export function TreeCanvas({
           >
             <Text
               style={{
-                fontFamily: 'Georgia',
+                fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
                 fontSize: 12,
                 color: areaBox.labelTextColor ?? '#1f2937',
                 fontWeight: '600',
@@ -885,7 +1124,7 @@ export function TreeCanvas({
             >
               <Text
                 style={{
-                  fontFamily: 'Georgia',
+                  fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
                   fontSize: 11,
                   color: sa.labelTextColor ?? '#fff',
                   fontWeight: '600',
@@ -897,6 +1136,6 @@ export function TreeCanvas({
           </View>
         );
       })}
-    </View>
+    </Pressable>
   );
 }

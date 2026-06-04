@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CATEGORIES } from '@/constants/Categories';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { CategoryId } from '@/lib/mocks/types';
 
 // Figure 15 의 2×2 grid 순서 그대로
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export function CategoryButtons({ active, onSelect }: Props) {
+  const { isKo } = useLocale();
   return (
     <View style={styles.grid}>
       {VISIBLE_IDS.map((id) => {
@@ -31,7 +33,7 @@ export function CategoryButtons({ active, onSelect }: Props) {
               isActive && styles.chipActive,
             ]}
           >
-            <Text style={styles.chipText}>{cat.label_ko}</Text>
+            <Text style={styles.chipText}>{isKo ? cat.label_ko : cat.label_en}</Text>
           </Pressable>
         );
       })}
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
   },
   chipText: {
     fontSize: 15,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#111',
   },
 });

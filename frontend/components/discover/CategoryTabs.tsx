@@ -1,6 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { CATEGORIES } from '@/constants/Categories';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { CategoryId } from '@/lib/mocks/types';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 export type DiscoverCategoryId = Extract<
   CategoryId,
@@ -26,6 +28,8 @@ type Props = {
 };
 
 export function CategoryTabs({ active, onSelect }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { isKo } = useLocale();
   return (
     <View style={styles.row}>
       {DISCOVER_CATEGORIES.map((id) => {
@@ -38,12 +42,15 @@ export function CategoryTabs({ active, onSelect }: Props) {
             style={[
               styles.chip,
               {
-                borderColor: isActive ? ACTIVE_OUTLINE[id] : '#e5e7eb',
+                backgroundColor: isDark ? tokens.surface : '#fff',
+                borderColor: isActive ? ACTIVE_OUTLINE[id] : tokens.border,
                 borderWidth: isActive ? 2 : 1,
               },
             ]}
           >
-            <Text style={styles.label}>{token.label_ko}</Text>
+            <Text style={[styles.label, { color: tokens.text }]}>
+              {isKo ? token.label_ko : token.label_en}
+            </Text>
           </Pressable>
         );
       })}
@@ -61,11 +68,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: '#fff',
   },
   label: {
     fontSize: 13,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
 });

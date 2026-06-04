@@ -26,26 +26,38 @@ const GRADE_POINTS: Record<string, number> = {
   F: 0.0,
 };
 
-const REQUIREMENT_LABELS: Record<ApiRequirementKey, { id: RequirementGroupId; label: string }> = {
-  basic: { id: 'other_requirements', label: 'Others' },
-  major_required: { id: 'required_major', label: 'Required Major' },
-  major_elective: { id: 'elective_major', label: 'Elective Major' },
-  graduation_research: { id: 'graduation_research', label: 'Graduation Research' },
+const REQUIREMENT_LABELS: Record<
+  ApiRequirementKey,
+  { id: RequirementGroupId; label_ko: string; label_en: string }
+> = {
+  basic: { id: 'other_requirements', label_ko: '기타', label_en: 'Others' },
+  major_required: { id: 'required_major', label_ko: '전공 필수', label_en: 'Required Major' },
+  major_elective: { id: 'elective_major', label_ko: '전공 선택', label_en: 'Elective Major' },
+  major_total: { id: 'major_total', label_ko: '전공 합계', label_en: 'Major Total' },
+  capstone: { id: 'capstone', label_ko: '졸업 작품', label_en: 'Capstone' },
+  graduation_research: {
+    id: 'graduation_research',
+    label_ko: '졸업 연구',
+    label_en: 'Graduation Research',
+  },
 };
 
-const REQUIREMENT_TO_CATEGORY: Record<ApiRequirementKey, CategoryId> = {
+// major_total / capstone 그룹의 course items 은 다른 그룹과 중복되므로
+// 상세 코스 리스트엔 표시하지 않는다 (skip).
+const REQUIREMENT_TO_CATEGORY: Partial<Record<ApiRequirementKey, CategoryId>> = {
   basic: 'general_elective',
   major_required: 'major_required',
   major_elective: 'major_elective',
   graduation_research: 'graduation_research',
 };
 
+// major_total 은 major_required + major_elective 의 집계라 합계에서 중복 제외.
+const AGGREGATE_REQUIREMENT_KEYS = new Set<string>(['major_total']);
+
 export function mapStatSummary(payload: ApiCreditGpa): StatSummary {
-  const totalRequired = payload.requirements.reduce((sum, r) => sum + r.requiredCredits, 0);
-  const plannedAddition = payload.requirements.reduce(
-    (sum, r) => sum + r.remainingCredits,
-    0,
-  );
+  const primary = payload.requirements.filter((r) => !AGGREGATE_REQUIREMENT_KEYS.has(r.key));
+  const totalRequired = primary.reduce((sum, r) => sum + r.requiredCredits, 0);
+  const plannedAddition = primary.reduce((sum, r) => sum + r.remainingCredits, 0);
   return {
     earnedCredits: payload.credits.completed,
     totalRequiredCredits: totalRequired,
@@ -61,7 +73,8 @@ export function mapRequirementGroups(payload: ApiCreditGpa): RequirementGroup[] 
     const meta = REQUIREMENT_LABELS[r.key];
     return {
       id: meta.id,
-      label_en: meta.label,
+      label_ko: meta.label_ko,
+      label_en: meta.label_en,
       earned: r.completedCredits,
       required: r.requiredCredits,
       planned: r.inProgressCredits,
@@ -91,6 +104,8 @@ function gradeForUi(grade: string): Grade | undefined {
 export function mapCourseEntries(payload: ApiCreditGpa): CourseListEntry[] {
   const entries: CourseListEntry[] = [];
   for (const group of payload.courses as ApiCreditGpaGroup[]) {
+    // capstone / major_total 은 다른 그룹의 item 을 다시 모아두는 집계 그룹이라 skip.
+    if (!(group.key in REQUIREMENT_TO_CATEGORY)) continue;
     const category = group.items.length ? REQUIREMENT_TO_CATEGORY[group.key] : undefined;
     for (const item of group.items) {
       const status = statusFor(item.status);
@@ -99,6 +114,7 @@ export function mapCourseEntries(payload: ApiCreditGpa): CourseListEntry[] {
       const gpaPoint = gradeUi ? GRADE_POINTS[item.grade] : undefined;
       entries.push({
         code: item.courseCode,
+        name_ko: item.title,
         name_en: item.titleEn ?? item.title,
         credit: item.credit,
         category: item.type === 'custom' ? undefined : category,
@@ -108,18 +124,10 @@ export function mapCourseEntries(payload: ApiCreditGpa): CourseListEntry[] {
         plannedAddition: status === 'planned' ? item.credit : undefined,
         semester: item.semester,
         rawGrade: item.grade,
+        isCustom: item.type === 'custom',
       });
     }
   }
   return entries;
 }
 
-export function buildSemesterOptions(currentSemester: string): SemesterOption[] {
-  // 현재 학기를 첫 번째로 두고 8개 슬롯 전체를 보여준다.
-  const ordered = [...SEMESTER_SLOTS].sort((a, b) => {
-    if (a.id === currentSemester) return -1;
-    if (b.id === currentSemester) return 1;
-    return 0;
-  });
-  return ordered.map((slot) => ({ id: slot.id, label: slot.label }));
-}

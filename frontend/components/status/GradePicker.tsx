@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { ApiRoadmapGrade } from '@/lib/api/roadmap';
+import { useLocale } from '@/lib/locale/LocaleContext';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   courseCode: string;
@@ -10,56 +12,86 @@ type Props = {
 };
 
 // 표시 순서. PLANNED → KAIST 4.3 scale → S/U/R.
-const GRADE_OPTIONS: { value: ApiRoadmapGrade; label: string; point?: number }[] = [
-  { value: 'PLANNED', label: 'Not Taken' },
-  { value: 'A+', label: 'A+', point: 4.3 },
-  { value: 'A0', label: 'A0', point: 4.0 },
-  { value: 'A-', label: 'A-', point: 3.7 },
-  { value: 'B+', label: 'B+', point: 3.3 },
-  { value: 'B0', label: 'B0', point: 3.0 },
-  { value: 'B-', label: 'B-', point: 2.7 },
-  { value: 'C+', label: 'C+', point: 2.3 },
-  { value: 'C0', label: 'C0', point: 2.0 },
-  { value: 'C-', label: 'C-', point: 1.7 },
-  { value: 'D+', label: 'D+', point: 1.3 },
-  { value: 'D0', label: 'D0', point: 1.0 },
-  { value: 'D-', label: 'D-', point: 0.7 },
-  { value: 'F', label: 'F', point: 0.0 },
-  { value: 'S', label: 'S (Pass)' },
-  { value: 'U', label: 'U (Fail, no GPA)' },
-  { value: 'R', label: 'R (Retake, excluded)' },
+const GRADE_OPTIONS: { value: ApiRoadmapGrade; label_ko: string; label_en: string; point?: number }[] = [
+  { value: 'PLANNED', label_ko: '미수강', label_en: 'Not Taken' },
+  { value: 'A+', label_ko: 'A+', label_en: 'A+', point: 4.3 },
+  { value: 'A0', label_ko: 'A0', label_en: 'A0', point: 4.0 },
+  { value: 'A-', label_ko: 'A-', label_en: 'A-', point: 3.7 },
+  { value: 'B+', label_ko: 'B+', label_en: 'B+', point: 3.3 },
+  { value: 'B0', label_ko: 'B0', label_en: 'B0', point: 3.0 },
+  { value: 'B-', label_ko: 'B-', label_en: 'B-', point: 2.7 },
+  { value: 'C+', label_ko: 'C+', label_en: 'C+', point: 2.3 },
+  { value: 'C0', label_ko: 'C0', label_en: 'C0', point: 2.0 },
+  { value: 'C-', label_ko: 'C-', label_en: 'C-', point: 1.7 },
+  { value: 'D+', label_ko: 'D+', label_en: 'D+', point: 1.3 },
+  { value: 'D0', label_ko: 'D0', label_en: 'D0', point: 1.0 },
+  { value: 'D-', label_ko: 'D-', label_en: 'D-', point: 0.7 },
+  { value: 'F', label_ko: 'F', label_en: 'F', point: 0.0 },
+  { value: 'S', label_ko: 'S (Pass)', label_en: 'S (Pass)' },
+  { value: 'U', label_ko: 'U (낙제, GPA 제외)', label_en: 'U (Fail, no GPA)' },
+  { value: 'R', label_ko: 'R (재수강, 제외)', label_en: 'R (Retake, excluded)' },
 ];
 
+const ACCENT = '#a78bfa';
+const ACCENT_BG_LIGHT = '#f3efff';
+const ACCENT_BG_DARK = '#2a2240';
+
 export function GradePicker({ courseCode, selectedGrade, onSelect, onClose }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { t, locale } = useLocale();
+  const selectedBg = isDark ? ACCENT_BG_DARK : ACCENT_BG_LIGHT;
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="box-none">
-      <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-      <View style={styles.panel}>
-        <View style={styles.header}>
-          <Text style={styles.headerCode}>{courseCode}</Text>
-          <Text style={styles.headerLabel}>Set grade</Text>
+      <Pressable style={[StyleSheet.absoluteFill, styles.backdrop]} onPress={onClose} />
+      <View style={[styles.panel, { backgroundColor: tokens.background, borderColor: tokens.border }]}>
+        <View style={[styles.header, { borderBottomColor: tokens.border }]}>
+          <Text style={[styles.headerCode, { color: tokens.text }]}>{courseCode}</Text>
+          <Text style={[styles.headerLabel, { color: tokens.subtext }]}>
+            {t('성적 선택', 'Select grade')}
+          </Text>
         </View>
         <ScrollView style={styles.list} contentContainerStyle={styles.listInner}>
-          {GRADE_OPTIONS.map((opt, idx) => {
+          {GRADE_OPTIONS.map((opt) => {
             const isSelected = opt.value === selectedGrade;
+            const label = locale === 'ko' ? opt.label_ko : opt.label_en;
             return (
               <Pressable
                 key={opt.value}
                 onPress={() => onSelect(opt.value)}
-                style={[styles.row, idx > 0 && styles.rowDivider, isSelected && styles.rowActive]}
+                style={({ pressed }) => [
+                  styles.row,
+                  isSelected && { backgroundColor: selectedBg },
+                  pressed && !isSelected && { backgroundColor: isDark ? '#1f2937' : '#f3f4f6' },
+                ]}
               >
-                <Text style={[styles.label, isSelected && styles.labelActive]}>
-                  {opt.label}
-                </Text>
-                {opt.point !== undefined ? (
-                  <Text style={[styles.point, isSelected && styles.labelActive]}>
-                    {opt.point.toFixed(1)}
+                <View style={styles.rowLeft}>
+                  <Text
+                    style={[
+                      styles.label,
+                      { color: isSelected ? ACCENT : tokens.text },
+                      isSelected && styles.labelActive,
+                    ]}
+                  >
+                    {label}
                   </Text>
-                ) : (
-                  <View style={styles.checkSlot}>
-                    {isSelected ? <Ionicons name="checkmark" size={14} color="#fff" /> : null}
-                  </View>
-                )}
+                </View>
+                <View style={styles.rowRight}>
+                  {opt.point !== undefined ? (
+                    <Text
+                      style={[
+                        styles.point,
+                        { color: isSelected ? ACCENT : tokens.subtext },
+                      ]}
+                    >
+                      {opt.point.toFixed(1)}
+                    </Text>
+                  ) : null}
+                  {isSelected ? (
+                    <Ionicons name="checkmark-circle" size={18} color={ACCENT} />
+                  ) : (
+                    <View style={styles.checkSlot} />
+                  )}
+                </View>
               </Pressable>
             );
           })}
@@ -70,80 +102,85 @@ export function GradePicker({ courseCode, selectedGrade, onSelect, onClose }: Pr
 }
 
 const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: 'rgba(0,0,0,0.35)',
+  },
   panel: {
     position: 'absolute',
-    top: '20%',
+    top: '18%',
     alignSelf: 'center',
-    width: 260,
-    maxHeight: 420,
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    width: 280,
+    maxHeight: 440,
+    borderRadius: 18,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingTop: 4,
+    paddingBottom: 8,
     overflow: 'hidden',
     ...Platform.select({
-      web: { boxShadow: '0 8px 24px rgba(0,0,0,0.18)' } as object,
+      web: { boxShadow: '0 16px 40px rgba(0,0,0,0.22)' } as object,
       ios: {
         shadowColor: '#000',
-        shadowOpacity: 0.18,
-        shadowRadius: 18,
-        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.24,
+        shadowRadius: 26,
+        shadowOffset: { width: 0, height: 14 },
       },
-      android: { elevation: 10 },
+      android: { elevation: 14 },
     }),
   },
   header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingTop: 12,
+    paddingBottom: 12,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e5e7eb',
     gap: 2,
   },
   headerCode: {
-    fontFamily: 'Georgia',
-    fontSize: 14,
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    fontSize: 15,
+    fontWeight: '600',
   },
   headerLabel: {
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     fontSize: 11,
-    color: '#6b7280',
   },
   list: {
-    maxHeight: 360,
+    maxHeight: 380,
   },
   listInner: {
-    paddingVertical: 4,
+    paddingHorizontal: 6,
+    paddingTop: 6,
+    paddingBottom: 4,
+    gap: 2,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 10,
+    borderRadius: 12,
   },
-  rowDivider: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#f3f4f6',
+  rowLeft: {
+    flex: 1,
   },
-  rowActive: {
-    backgroundColor: '#a78bfa',
+  rowRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   label: {
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     fontSize: 14,
-    color: '#111',
   },
   labelActive: {
-    color: '#fff',
+    fontWeight: '600',
   },
   point: {
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     fontSize: 12,
-    color: '#6b7280',
   },
   checkSlot: {
-    width: 16,
-    height: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 18,
+    height: 18,
   },
 });

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -16,21 +17,21 @@ import { SUBTOPICS } from '@/constants/Subtopics';
 import { type ApiCourse, listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
 import { useFocus } from '@/lib/discover/FocusContext';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
 import { useSidebar } from '@/lib/sidebar/SidebarContext';
+import { useTheme } from '@/lib/theme/ThemeContext';
 import { useCart } from '@/lib/timetable/CartContext';
 
 const PANEL_WIDTH = 400;
 const ANIM_DURATION = 220;
 
-// AppHeader 영역(상단)과 CustomTabBar 영역(하단) 이 보이도록 패널 inset.
-const TOP_INSET = 72;
-const BOTTOM_INSET = 96;
-
 export function SidebarOverlay() {
   const { isOpen, close } = useSidebar();
   const { setFocus } = useFocus();
   const { addToCart } = useCart();
+  const { tokens } = useTheme();
+  const { t } = useLocale();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
   const [selectedSubtopic, setSelectedSubtopic] = useState<SubtopicId | null>(null);
@@ -74,9 +75,22 @@ export function SidebarOverlay() {
         style={StyleSheet.absoluteFill}
         accessibilityLabel="Close sidebar"
       />
-      <Animated.View style={[styles.panel, panelStyle]}>
+      <Animated.View style={[styles.panel, { backgroundColor: tokens.background }, panelStyle]}>
         <View style={styles.searchWrap}>
-          <SearchInput value={searchText} onChange={setSearchText} />
+          <View style={styles.searchRow}>
+            <View style={styles.searchInputSlot}>
+              <SearchInput value={searchText} onChange={setSearchText} />
+            </View>
+            <Pressable
+              onPress={close}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Close sidebar"
+              style={styles.closeBtn}
+            >
+              <Ionicons name="close" size={22} color={tokens.text} />
+            </Pressable>
+          </View>
         </View>
         {hasFilter ? (
           <ScrollView contentContainerStyle={styles.results}>
@@ -87,7 +101,9 @@ export function SidebarOverlay() {
               <CategoryHeader id={selectedCategory} onClear={() => setSelectedCategory(null)} />
             ) : null}
             {!loading && (results ?? []).length === 0 ? (
-              <Text style={styles.empty}>일치하는 과목이 없습니다.</Text>
+              <Text style={[styles.empty, { color: tokens.subtext }]}>
+                {t('일치하는 과목이 없습니다.', 'No matching courses.')}
+              </Text>
             ) : null}
             {(results ?? []).map((c) => (
               <CourseResultCard
@@ -129,20 +145,22 @@ export function SidebarOverlay() {
 }
 
 function SectorHeader({ id, onClear }: { id: SubtopicId; onClear: () => void }) {
-  const t = SUBTOPICS[id];
+  const sub = SUBTOPICS[id];
+  const { isKo } = useLocale();
   return (
-    <Pressable onPress={onClear} style={[styles.headerChip, { backgroundColor: t.bgColor }]}>
-      <Text style={styles.headerLabel}>{t.label_ko}</Text>
-      <View style={[styles.headerDot, { backgroundColor: t.dotColor }]} />
+    <Pressable onPress={onClear} style={[styles.headerChip, { backgroundColor: sub.bgColor }]}>
+      <Text style={styles.headerLabel}>{isKo ? sub.label_ko : sub.label_en}</Text>
+      <View style={[styles.headerDot, { backgroundColor: sub.dotColor }]} />
     </Pressable>
   );
 }
 
 function CategoryHeader({ id, onClear }: { id: CategoryId; onClear: () => void }) {
   const c = CATEGORIES[id];
+  const { isKo } = useLocale();
   return (
     <Pressable onPress={onClear} style={[styles.headerChip, { backgroundColor: c.chipColor }]}>
-      <Text style={styles.headerLabel}>{c.label_ko}</Text>
+      <Text style={styles.headerLabel}>{isKo ? c.label_ko : c.label_en}</Text>
     </Pressable>
   );
 }
@@ -150,21 +168,30 @@ function CategoryHeader({ id, onClear }: { id: CategoryId; onClear: () => void }
 const styles = StyleSheet.create({
   panel: {
     position: 'absolute',
-    top: TOP_INSET,
+    top: 0,
     right: 0,
-    bottom: BOTTOM_INSET,
+    bottom: 0,
     width: PANEL_WIDTH,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
     overflow: 'hidden',
   },
   searchWrap: {
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  searchInputSlot: {
+    flex: 1,
+  },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   body: {
     paddingHorizontal: 16,
@@ -178,7 +205,7 @@ const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#6b7280',
     paddingVertical: 16,
     textAlign: 'center',
@@ -193,16 +220,16 @@ const styles = StyleSheet.create({
   },
   headerLabel: {
     fontSize: 14,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#111',
     fontWeight: '600',
   },
   headerDot: { width: 10, height: 10, borderRadius: 5 },
   detailWrap: {
     position: 'absolute',
-    top: TOP_INSET + 8,
+    top: 16,
     left: 12,
     right: 12,
-    bottom: BOTTOM_INSET + 8,
+    bottom: 16,
   },
 });

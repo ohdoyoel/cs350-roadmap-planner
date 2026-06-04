@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { FilterMode } from '@/lib/mocks/timetableFixture';
 import { FILTER_MODES } from '@/lib/mocks/timetableFixture';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   active: FilterMode;
@@ -14,6 +16,8 @@ const GAP = 6;
 const DURATION = 220;
 
 export function FilterModeBar({ active, onSelect }: Props) {
+  const { tokens, isDark } = useTheme();
+  const { isKo } = useLocale();
   const [expanded, setExpanded] = useState(false);
   const anim = useRef(new Animated.Value(0)).current;
 
@@ -34,7 +38,7 @@ export function FilterModeBar({ active, onSelect }: Props) {
   return (
     <View style={styles.bar}>
       <Pressable onPress={toggle} hitSlop={6} style={styles.cog}>
-        <Ionicons name="settings-outline" size={16} color="#6b7280" />
+        <Ionicons name="settings-outline" size={16} color={tokens.subtext} />
       </Pressable>
       {FILTER_MODES.map((mode) => {
         const isActive = mode.id === active;
@@ -54,13 +58,20 @@ export function FilterModeBar({ active, onSelect }: Props) {
           >
             <Pressable
               onPress={() => (expanded && !isActive ? select(mode.id) : toggle())}
-              style={[styles.tab, isActive && styles.tabActive]}
+              style={[
+                styles.tab,
+                { backgroundColor: isDark ? tokens.surface : '#f3f4f6' },
+                isActive && styles.tabActive,
+              ]}
             >
               <Text
-                style={[styles.label, isActive && styles.labelActive]}
+                style={[
+                  styles.label,
+                  { color: isActive ? '#fff' : tokens.subtext },
+                ]}
                 numberOfLines={1}
               >
-                {mode.label_ko}
+                {isKo ? mode.label_ko : mode.label_en}
               </Text>
             </Pressable>
           </Animated.View>
@@ -95,7 +106,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#6b7280',
   },
   labelActive: {

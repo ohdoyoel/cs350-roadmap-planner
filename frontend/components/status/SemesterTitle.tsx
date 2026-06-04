@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { DiamondIcon } from '@/components/icons/DiamondIcon';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   label: string;
@@ -7,15 +8,16 @@ type Props = {
 };
 
 export function SemesterTitle({ label, onPress }: Props) {
+  const { tokens, isDark } = useTheme();
   return (
     <Pressable
       onPress={onPress}
-      style={styles.pill}
+      style={[styles.pill, { backgroundColor: isDark ? tokens.surface : '#f3f4f6' }]}
       accessibilityRole="button"
       hitSlop={6}
     >
-      <Text style={styles.label}>{label}</Text>
-      <DiamondIcon size={10} />
+      <Text style={[styles.label, { color: tokens.text }]}>{label}</Text>
+      <DiamondIcon size={10} color={tokens.text} />
     </Pressable>
   );
 }
@@ -28,11 +30,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 4,
     borderRadius: 16,
-    backgroundColor: '#f3f4f6',
   },
   label: {
     fontSize: 16,
-    fontFamily: 'Georgia',
-    color: '#111',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
   },
 });

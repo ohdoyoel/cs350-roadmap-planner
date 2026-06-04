@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +5,9 @@ import { AppHeader } from '@/components/AppHeader';
 import { AddSemesterRow } from '@/components/timetable/AddSemesterRow';
 import { FilterChipRow } from '@/components/timetable/FilterChipRow';
 import { FilterModeBar } from '@/components/timetable/FilterModeBar';
+import { PrerequisiteWarningAlert } from '@/components/timetable/PrerequisiteWarningAlert';
 import { SemesterRow } from '@/components/timetable/SemesterRow';
+import { TrashDropZone } from '@/components/timetable/TrashDropZone';
 import { UNPLACED_LIST_ID, UnplacedCourseRow } from '@/components/timetable/UnplacedCourseRow';
 import { categoryIdFromKo } from '@/constants/Categories';
 import { subtopicIdFromKo } from '@/constants/Subtopics';
@@ -18,6 +19,7 @@ import {
   type TimetableCard,
 } from '@/lib/mocks/timetableFixture';
 import type { CategoryId, SubtopicId } from '@/lib/mocks/types';
+import { useTheme } from '@/lib/theme/ThemeContext';
 import { useCart } from '@/lib/timetable/CartContext';
 
 type CardLists = Record<string, TimetableCard[]>;
@@ -41,10 +43,22 @@ function isCardVisible(
 }
 
 export default function Timetable() {
+  const { tokens } = useTheme();
   const [mode, setMode] = useState<FilterMode>('grade');
   const [gradeChip, setGradeChip] = useState<CategoryId | null>(null);
   const [subjectChip, setSubjectChip] = useState<SubtopicId | null>(null);
-  const { lists, semesters, handleDrop, loading: roadmapLoading, error: roadmapError } = useCart();
+  const {
+    lists,
+    semesters,
+    handleDrop,
+    loading: roadmapLoading,
+    error: roadmapError,
+    newWarnings,
+    dismissWarnings,
+    addExtraSemester,
+    removeExtraSemester,
+    isExtraSemester,
+  } = useCart();
 
   const { data: courses, loading: coursesLoading, error: coursesError } = useApi(
     () => listCourses(),
@@ -70,10 +84,11 @@ export default function Timetable() {
   }, [lists, courseByCode, mode, gradeChip, subjectChip]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <AppHeader title="Timetable" onLeftPress={() => router.push('/settings')} />
+    <SafeAreaView style={[styles.container, { backgroundColor: tokens.background }]} edges={['top']}>
+      <AppHeader title="Timetable" />
+      <PrerequisiteWarningAlert warnings={newWarnings} onDismiss={dismissWarnings} />
       <DnDProvider onDrop={handleDrop}>
-        <View style={styles.stickyTop}>
+        <View style={[styles.stickyTop, { backgroundColor: tokens.background, borderColor: tokens.border }]}>
           <FilterModeBar active={mode} onSelect={setMode} />
           <FilterChipRow
             mode={mode}
@@ -108,11 +123,15 @@ export default function Timetable() {
                 cards={lists[sem.id] ?? []}
                 visibleCards={visibleByList[sem.id] ?? []}
                 courseByCode={courseByCode}
+                onDelete={
+                  isExtraSemester(sem.id) ? () => void removeExtraSemester(sem.id) : undefined
+                }
               />
             ))}
-            <AddSemesterRow />
+            <AddSemesterRow onPress={addExtraSemester} />
           </ScrollView>
         )}
+        <TrashDropZone />
       </DnDProvider>
     </SafeAreaView>
   );
@@ -139,7 +158,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 12,
-    fontFamily: 'Georgia',
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#dc2626',
     paddingHorizontal: 16,
     paddingTop: 12,

@@ -5,6 +5,8 @@ export type ApiRequirementKey =
   | 'basic'
   | 'major_required'
   | 'major_elective'
+  | 'major_total'
+  | 'capstone'
   | 'graduation_research';
 
 export type ApiCreditGpaStatus =

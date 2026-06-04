@@ -1,66 +1,49 @@
-import { ReactNode, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { GradientAvatar } from '@/components/GradientAvatar';
 import { MenuIcon } from '@/components/icons/MenuIcon';
 import { useSession } from '@/lib/session/SessionContext';
+import { useTheme } from '@/lib/theme/ThemeContext';
 
 type Props = {
   title?: string;
   children?: ReactNode;
   onLeftPress?: () => void;
+  leftIcon?: 'menu' | 'back';
 };
 
-export function AppHeader({ title, children, onLeftPress }: Props) {
-  const { user, signOut } = useSession();
-  const [menuOpen, setMenuOpen] = useState(false);
+export function AppHeader({ title, children, onLeftPress, leftIcon = 'menu' }: Props) {
+  const { user } = useSession();
+  const { tokens } = useTheme();
 
-  const initial = (user?.name?.trim()?.[0] ?? user?.kaistEmail?.[0] ?? '?').toUpperCase();
+  const seed = user?.kaistEmail ?? user?.id ?? 'anon';
 
   return (
-    <View style={styles.container}>
-      <Pressable
-        onPress={onLeftPress}
-        hitSlop={8}
-        accessibilityRole="button"
-        style={styles.leftSlot}
-        disabled={!onLeftPress}
-      >
-        <MenuIcon size={24} />
-      </Pressable>
+    <View style={[styles.container, { backgroundColor: tokens.headerBg }]}>
+      <View style={styles.leftSlot}>
+        {onLeftPress ? (
+          <Pressable onPress={onLeftPress} hitSlop={8} accessibilityRole="button">
+            {leftIcon === 'back' ? (
+              <Ionicons name="arrow-back" size={24} color={tokens.text} />
+            ) : (
+              <MenuIcon size={24} color={tokens.text} />
+            )}
+          </Pressable>
+        ) : null}
+      </View>
       <View style={styles.titleSlot}>
-        {children ?? (title ? <Text style={styles.title}>{title}</Text> : null)}
+        {children ?? (title ? <Text style={[styles.title, { color: tokens.text }]}>{title}</Text> : null)}
       </View>
       <Pressable
-        onPress={() => setMenuOpen((v) => !v)}
+        onPress={() => router.push('/settings')}
         hitSlop={8}
         accessibilityRole="button"
-        accessibilityLabel="User menu"
-        style={styles.profile}
+        accessibilityLabel="Open settings"
       >
-        <Text style={styles.initial}>{initial}</Text>
+        <GradientAvatar seed={seed} size={32} />
       </Pressable>
-      {menuOpen ? (
-        <>
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            onPress={() => setMenuOpen(false)}
-            accessibilityLabel="Close user menu"
-          />
-          <View style={styles.menu}>
-            <Text style={styles.menuEmail} numberOfLines={1}>
-              {user?.kaistEmail ?? ''}
-            </Text>
-            <Pressable
-              style={styles.menuRow}
-              onPress={() => {
-                setMenuOpen(false);
-                void signOut();
-              }}
-            >
-              <Text style={styles.menuRowLabel}>Logout</Text>
-            </Pressable>
-          </View>
-        </>
-      ) : null}
     </View>
   );
 }
@@ -86,51 +69,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: 'Georgia',
-    color: '#111',
-  },
-  profile: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#e5e7eb',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  initial: {
-    fontFamily: 'Georgia',
-    fontSize: 14,
-    color: '#374151',
-  },
-  menu: {
-    position: 'absolute',
-    top: 60,
-    right: 16,
-    minWidth: 200,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    gap: 4,
-  },
-  menuEmail: {
-    fontFamily: 'Georgia',
-    fontSize: 12,
-    color: '#6b7280',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-  },
-  menuRow: {
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e5e7eb',
-  },
-  menuRowLabel: {
-    fontFamily: 'Georgia',
-    fontSize: 14,
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#111',
   },
 });

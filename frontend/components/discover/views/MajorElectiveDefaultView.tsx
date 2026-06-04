@@ -9,6 +9,7 @@ import {
   type DiscoverCategoryId,
 } from '@/components/discover/CategoryTabs';
 import { CATEGORIES } from '@/constants/Categories';
+import { useLocale } from '@/lib/locale/LocaleContext';
 import type { SubtopicId } from '@/lib/mocks/types';
 
 const TREE_MAX_WIDTH = 340;
@@ -23,25 +24,34 @@ type Props = {
   active: DiscoverCategoryId;
   onSelectCategory: (id: DiscoverCategoryId) => void;
   onSelectSector: (id: SubtopicId) => void;
+  onSelectKeyCourses?: () => void;
 };
 
-export function MajorElectiveDefaultView({ active, onSelectCategory, onSelectSector }: Props) {
+export function MajorElectiveDefaultView({
+  active,
+  onSelectCategory,
+  onSelectSector,
+  onSelectKeyCourses,
+}: Props) {
+  const { t, pick } = useLocale();
   const { nodes, edges } = useMemo(() => {
     const rootNode: TreeNode = {
       id: 'root',
       width: 150,
       height: 30,
       inArea: false,
-      render: () => <RootNode courseCode="CS101" courseName="프로그래밍 기초" />,
+      render: () => (
+        <RootNode courseCode="CS101" courseName={t('프로그래밍 기초', 'Programming Basics')} />
+      ),
     };
     const chipNodes: TreeNode[] = DISCOVER_CATEGORIES.map((catId) => ({
       id: `chip_${catId}`,
-      width: 70,
+      width: 96,
       height: 26,
       inArea: false,
       render: () => (
         <ChipBox
-          label={CATEGORIES[catId].label_ko}
+          label={pick({ ko: CATEGORIES[catId].label_ko, en: CATEGORIES[catId].label_en })}
           active={catId === active}
           outlineColor={ACTIVE_OUTLINE[catId]}
           onPress={() => onSelectCategory(catId)}
@@ -53,12 +63,12 @@ export function MajorElectiveDefaultView({ active, onSelectCategory, onSelectSec
       to: `chip_${catId}`,
     }));
     return { nodes: [rootNode, ...chipNodes], edges: treeEdges };
-  }, [active, onSelectCategory]);
+  }, [active, onSelectCategory, t, pick]);
 
   return (
     <View style={styles.wrapper}>
       <TreeCanvas nodes={nodes} edges={edges} maxWidth={TREE_MAX_WIDTH} />
-      <SectorChipGrid onSelectSector={onSelectSector} />
+      <SectorChipGrid onSelectSector={onSelectSector} onSelectKeyCourses={onSelectKeyCourses} />
     </View>
   );
 }

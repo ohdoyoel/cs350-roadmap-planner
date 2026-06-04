@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChipBox } from '@/components/discover/ChipBox';
 import { CourseCard } from '@/components/discover/CourseCard';
 import { RootNode } from '@/components/discover/RootNode';
@@ -13,8 +13,8 @@ import { listCourses } from '@/lib/api/courses';
 import { useApi } from '@/lib/api/useApi';
 import { useLocale } from '@/lib/locale/LocaleContext';
 
-const AREA_COLOR = '#fef9c3';
-const LABEL_BG = '#fef08a';
+const AREA_COLOR = '#a07a48';
+const LABEL_BG = '#7c4a1a';
 const TREE_MAX_WIDTH = 340;
 
 const ACTIVE_OUTLINE: Record<DiscoverCategoryId, string> = {
@@ -26,13 +26,14 @@ const ACTIVE_OUTLINE: Record<DiscoverCategoryId, string> = {
 type Props = {
   active: DiscoverCategoryId;
   onSelectCategory: (id: DiscoverCategoryId) => void;
+  onBack: () => void;
 };
 
-export function BasicElectiveView({ active, onSelectCategory }: Props) {
+export function MajorElectiveKeyView({ active, onSelectCategory, onBack }: Props) {
   const { t, pick } = useLocale();
   const { data, loading, error } = useApi(
-    () => listCourses({ category: '기초선택', includePrerequisites: true }),
-    ['basic_elective'],
+    () => listCourses({ isKeyCourse: true, includePrerequisites: true }),
+    ['key_courses'],
   );
 
   const { nodes, edges } = useMemo(() => {
@@ -68,13 +69,15 @@ export function BasicElectiveView({ active, onSelectCategory }: Props) {
       id: course.courseCode,
       width: 92,
       height: 82,
-      inArea: true,
+      inArea: course.matched,
       selectable: true,
       render: () => <CourseCard course={course} />,
     }));
 
+    const outerCourses = data.filter((c) => !c.matched);
+
     const areaLabelNode: TreeNode = {
-      id: 'area_label_basic',
+      id: 'area_label_key',
       width: 88,
       height: 22,
       inArea: false,
@@ -89,13 +92,25 @@ export function BasicElectiveView({ active, onSelectCategory }: Props) {
       to: `chip_${catId}`,
     }));
 
-    dummyEdges.push({ from: 'chip_general_elective', to: 'area_label_basic' });
+    outerCourses.forEach((c) => {
+      dummyEdges.push({ from: 'chip_major_elective', to: c.courseCode });
+    });
 
-    const innerRoots = data.filter((c) =>
-      c.prerequisites.every((p) => !ids.has(p)),
+    dummyEdges.push({ from: 'chip_major_elective', to: 'area_label_key' });
+
+    const innerRoots = data.filter(
+      (c) =>
+        c.matched &&
+        c.prerequisites.every(
+          (p) => !data.find((c2) => c2.courseCode === p)?.matched,
+        ),
     );
     innerRoots.forEach((c) => {
-      dummyEdges.push({ from: 'area_label_basic', to: c.courseCode, invisible: true });
+      dummyEdges.push({ from: 'area_label_key', to: c.courseCode, invisible: true });
+    });
+
+    outerCourses.forEach((o) => {
+      dummyEdges.push({ from: o.courseCode, to: 'area_label_key', invisible: true });
     });
 
     const prereqEdges: TreeEdge[] = [];
@@ -110,40 +125,55 @@ export function BasicElectiveView({ active, onSelectCategory }: Props) {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={styles.wrapper}>
         <ActivityIndicator />
       </View>
     );
   }
   if (error) {
-    return <Text style={styles.error}>{error.message}</Text>;
+    return (
+      <View style={styles.wrapper}>
+        <Text style={styles.error}>{error.message}</Text>
+      </View>
+    );
   }
   return (
-    <View style={styles.center}>
+    <View style={styles.wrapper}>
       <TreeCanvas
         nodes={nodes}
         edges={edges}
         maxWidth={TREE_MAX_WIDTH}
         areaBox={{
           color: AREA_COLOR,
-          label: t('기초 선택 과목', 'Basic Elective Courses'),
+          label: t('주요 과목', 'Key Courses'),
           labelBg: LABEL_BG,
-          labelTextColor: '#713f12',
+          labelTextColor: '#fff',
         }}
       />
+      <Pressable onPress={onBack} style={styles.backLink} accessibilityRole="button">
+        <Text style={styles.backText}>{t('← 분야 선택으로 돌아가기', '← Back to sectors')}</Text>
+      </Pressable>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  center: {
+  wrapper: {
     alignItems: 'center',
+    gap: 10,
+  },
+  backLink: {
+    paddingVertical: 6,
+  },
+  backText: {
+    fontSize: 12,
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    color: '#374151',
   },
   error: {
     fontSize: 12,
     fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     color: '#dc2626',
     textAlign: 'center',
-    paddingVertical: 12,
   },
 });
