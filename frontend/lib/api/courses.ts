@@ -15,6 +15,7 @@ export type ApiCourse = {
   courseCode: string;
   courseName: string;
   courseNameEn: string | null;
+  description: string | null;
   category: string;
   sectors: string[];
   offeredSemesters: ApiOfferedSemester[];

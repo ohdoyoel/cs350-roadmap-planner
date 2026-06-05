@@ -69,7 +69,7 @@ export function CourseDetailPanel({ course, onClose, onAddToPlanned, onFindInTre
         />
         <Row
           label={t('설명', 'Description')}
-          value={t(`${displayName}에 대한 설명`, `Description of ${displayName}`)}
+          value={course.description ?? t('설명이 없습니다.', 'No description available.')}
           text={tokens.subtext}
           labelColor={tokens.text}
         />
