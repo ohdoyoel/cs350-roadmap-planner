@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
@@ -40,7 +41,11 @@ export function gradientFromSeed(seed: string): { from: string; to: string } {
 export function GradientAvatar({ seed, size }: Props) {
   const { from, to } = gradientFromSeed(seed);
   const radius = size / 2;
-  const gradientId = `avatarGrad-${seed.replace(/[^a-z0-9]/gi, '') || 'anon'}`;
+  // useId 로 인스턴스마다 unique id 부여 — 같은 seed 로 여러 아바타가 동시에 mount 돼도
+  // SVG `<linearGradient id>` 충돌이 안 생긴다 (Chrome 이 cross-svg url() 참조를 거부해서
+  // 아바타가 가끔씩 투명하게 보이던 문제 회피).
+  const reactId = useId();
+  const gradientId = `avatarGrad-${reactId.replace(/[^a-z0-9]/gi, '')}`;
   return (
     <View style={[styles.wrap, { width: size, height: size, borderRadius: radius }]}>
       <Svg width={size} height={size} style={StyleSheet.absoluteFill}>

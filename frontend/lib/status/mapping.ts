@@ -34,7 +34,7 @@ const REQUIREMENT_LABELS: Record<
   major_required: { id: 'required_major', label_ko: '전공 필수', label_en: 'Required Major' },
   major_elective: { id: 'elective_major', label_ko: '전공 선택', label_en: 'Elective Major' },
   major_total: { id: 'major_total', label_ko: '전공 합계', label_en: 'Major Total' },
-  capstone: { id: 'capstone', label_ko: '졸업 작품', label_en: 'Capstone' },
+  capstone: { id: 'capstone', label_ko: '캡스톤', label_en: 'Capstone' },
   graduation_research: {
     id: 'graduation_research',
     label_ko: '졸업 연구',
