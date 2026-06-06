@@ -33,13 +33,23 @@ export type SignupBody = {
   graduationYear?: number | null;
 };
 
+export type SignupResponse = {
+  kaistEmail: string;
+  emailSent: boolean;
+  message: string;
+};
+
 export type LoginBody = {
   email: string;
   password: string;
 };
 
 export function signup(body: SignupBody) {
-  return apiPost<ApiSession>('/auth/signup', body);
+  return apiPost<SignupResponse>('/auth/signup', body);
+}
+
+export function resendVerification(email: string) {
+  return apiPost<SignupResponse>('/auth/resend-verification', { email });
 }
 
 export function login(body: LoginBody) {
