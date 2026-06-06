@@ -17,6 +17,7 @@ import {
   type ApiMe,
   type ApiSession,
   type ApiUser,
+  type SignupResponse,
   getMe,
   login as apiLogin,
   logout as apiLogout,
@@ -37,7 +38,7 @@ type SessionContextValue = {
   user: ApiUser | null;
   me: ApiMe | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (input: { email: string; password: string; name?: string }) => Promise<void>;
+  signUp: (input: { email: string; password: string; name?: string }) => Promise<SignupResponse>;
   signOut: () => Promise<void>;
   setAcademicOption: (option: AcademicOption) => Promise<void>;
 };
@@ -126,18 +127,16 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [applySession],
   );
 
+  // 회원가입은 인증 메일만 발송한다. 세션은 메일 인증 후 로그인에서 생성된다.
   const signUp = useCallback(
     async (input: { email: string; password: string; name?: string }) => {
-      const session = await apiSignup({
+      return apiSignup({
         email: input.email,
         password: input.password,
         name: input.name ?? null,
       });
-      await applySession(session);
-      const fresh = await getMe();
-      setMe(fresh);
     },
-    [applySession],
+    [],
   );
 
   const setAcademicOption = useCallback(async (option: AcademicOption) => {

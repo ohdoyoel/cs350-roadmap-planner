@@ -1,8 +1,10 @@
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { ApiError } from '@/lib/api/client';
+import { resendVerification } from '@/lib/api/auth';
 import { useLocale } from '@/lib/locale/LocaleContext';
 import { useSession } from '@/lib/session/SessionContext';
 import { useTheme } from '@/lib/theme/ThemeContext';
@@ -18,6 +20,7 @@ export default function SignupScreen() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     setError(null);
@@ -31,12 +34,13 @@ export default function SignupScreen() {
     }
     setSubmitting(true);
     try {
+      const email = values.email.trim();
       await signUp({
-        email: values.email.trim(),
+        email,
         password: values.password,
         name: values.name?.trim() || undefined,
       });
-      router.replace('/');
+      setSentTo(email);
     } catch (err) {
       setError(messageFor(err, t));
     } finally {
@@ -48,6 +52,10 @@ export default function SignupScreen() {
   // DOM <a> 로 직접 전달되어 'Cannot set indexed properties' crash 유발.
   // 단일 객체로 flatten 해서 전달.
   const linkStyle = { ...styles.link, color: tokens.text };
+
+  if (sentTo) {
+    return <VerificationSent email={sentTo} linkStyle={linkStyle} />;
+  }
 
   return (
     <AuthForm
@@ -93,6 +101,74 @@ export default function SignupScreen() {
   );
 }
 
+function VerificationSent({
+  email,
+  linkStyle,
+}: {
+  email: string;
+  linkStyle: { color: string };
+}) {
+  const { tokens } = useTheme();
+  const { t } = useLocale();
+  const [resending, setResending] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const handleResend = async () => {
+    setNotice(null);
+    setResending(true);
+    try {
+      await resendVerification(email);
+      setNotice(t('인증 메일을 다시 보냈어요.', 'Verification email sent again.'));
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setNotice(t('이미 인증된 이메일이에요. 로그인해주세요.', 'Already verified — please log in.'));
+      } else {
+        setNotice(t('메일 재전송에 실패했어요. 잠시 후 다시 시도해주세요.', 'Could not resend. Try again later.'));
+      }
+    } finally {
+      setResending(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: tokens.background }} edges={['top', 'bottom']}>
+      <View style={styles.sentBody}>
+        <Text style={{ ...styles.brand, color: tokens.subtext }}>Roadmap Planner</Text>
+        <Text style={{ ...styles.title, color: tokens.text }}>
+          {t('메일함을 확인하세요', 'Check your inbox')}
+        </Text>
+        <Text style={{ ...styles.subtitle, color: tokens.subtext }}>
+          {t(
+            `${email}로 인증 메일을 보냈어요. 메일의 링크를 눌러 인증을 마친 뒤 로그인해주세요.`,
+            `We sent a verification link to ${email}. Open it to verify, then log in.`,
+          )}
+        </Text>
+
+        {notice ? (
+          <Text style={{ ...styles.notice, color: tokens.subtext }}>{notice}</Text>
+        ) : null}
+
+        <Pressable
+          onPress={handleResend}
+          disabled={resending}
+          accessibilityRole="button"
+          style={{ ...styles.resend, opacity: resending ? 0.5 : 1 }}
+        >
+          <Text style={{ ...styles.link, color: tokens.text }}>
+            {t('인증 메일 다시 보내기', 'Resend verification email')}
+          </Text>
+        </Pressable>
+
+        <View style={styles.footer}>
+          <Link href="/(auth)/login" replace asChild>
+            <Text style={linkStyle}>{t('로그인하러 가기', 'Go to log in')}</Text>
+          </Link>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
 function messageFor(err: unknown, t: (ko: string, en: string) => string): string {
   if (err instanceof ApiError) {
     if (err.status === 409) return t('이미 가입된 이메일입니다.', 'Email is already registered.');
@@ -106,5 +182,39 @@ const styles = StyleSheet.create({
     fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
     fontSize: 13,
     textDecorationLine: 'underline',
+  },
+  sentBody: {
+    flex: 1,
+    paddingHorizontal: 28,
+    paddingTop: 64,
+  },
+  brand: {
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    fontSize: 14,
+    letterSpacing: 1,
+  },
+  title: {
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    fontSize: 30,
+    marginTop: 10,
+  },
+  subtitle: {
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    fontSize: 13,
+    marginTop: 12,
+    lineHeight: 20,
+  },
+  notice: {
+    fontFamily: "Georgia, 'Pretendard Variable', Pretendard, sans-serif",
+    fontSize: 12,
+    marginTop: 20,
+  },
+  resend: {
+    marginTop: 24,
+    alignSelf: 'flex-start',
+  },
+  footer: {
+    marginTop: 28,
+    alignItems: 'flex-start',
   },
 });
